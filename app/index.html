@@ -7,340 +7,152 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Трекер">
-<meta name="theme-color" content="#1A1A1A">
+<meta name="theme-color" content="#2B2118">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon.svg">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Manrope:wght@400;500;600;700;800&family=Archivo:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=Fraunces:ital,wght@0,600;0,700;1,500&family=Work+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg: #FDFDFB;
-    --ink: #1A1A1A;
-    --body: #3A3A3A;
-    --red: #E24C4C;
-    --yellow: #FFE98A;
-    --frame: #F6F6F2;
-  }
-  *{box-sizing:border-box;}
-  html,body{
-    margin:0; padding:0;
-    background:var(--bg);
-    color:var(--ink);
-    font-family:'Manrope',sans-serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .wrap{
-    max-width:640px;
-    margin:0 auto;
-    padding:20px 16px 60px;
-  }
-  .eyebrow{
-    font-family:'Caveat',cursive;
-    font-weight:700;
-    font-size:20px;
-    color:var(--red);
-  }
-  h1{
-    font-family:'Manrope',sans-serif;
-    font-weight:800;
-    font-size:28px;
-    line-height:1.15;
-    margin:4px 0 2px;
-  }
-  .sub{
-    font-size:14px;
-    color:var(--body);
-    margin-bottom:18px;
-  }
-  .card{
-    background:var(--bg);
-    border:2px solid var(--ink);
-    border-radius:8px;
-    padding:16px;
-    margin-bottom:18px;
-    position:relative;
-  }
-  .card .eyebrow-sm{
-    font-family:'Caveat',cursive;
-    font-weight:700;
-    font-size:17px;
-    color:var(--red);
-    display:block;
-    margin-bottom:2px;
-  }
-  .card h2{
-    font-size:19px;
-    margin:0 0 12px;
-  }
-  .field{ margin-bottom:14px; }
-  .field label{
-    display:block;
-    font-size:13px;
-    font-weight:600;
-    margin-bottom:5px;
-  }
-  .field .hint{
-    font-size:12px;
-    color:var(--body);
-    margin-top:4px;
-  }
-  input[type=text], input[type=number], select, textarea{
-    width:100%;
-    font-family:'Manrope',sans-serif;
-    font-size:14px;
-    color:var(--ink);
-    border:2px solid var(--ink);
-    border-radius:6px;
-    padding:10px;
-    resize:vertical;
-    background:#fff;
-  }
-  textarea{ min-height:44px; }
-  textarea:focus, input:focus, select:focus{
-    outline:2px solid var(--red);
-    outline-offset:1px;
-  }
-  .checkbox-row{
-    display:flex;
-    align-items:flex-start;
-    gap:10px;
-    background:var(--frame);
-    border:2px solid var(--ink);
-    border-radius:6px;
-    padding:12px;
-    margin-bottom:12px;
-    cursor:pointer;
-  }
-  .checkbox-row input{
-    width:20px;height:20px;
-    flex:0 0 20px;
-    margin-top:2px;
-    accent-color:var(--ink);
-    cursor:pointer;
-  }
-  .checkbox-row span{
-    font-weight:600;
-    font-size:13.5px;
-    line-height:1.4;
-  }
-  .btn-row{
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    margin-top:4px;
-  }
-  button{
-    font-family:'Manrope',sans-serif;
-    font-weight:700;
-    font-size:14px;
-    border-radius:6px;
-    padding:11px 16px;
-    cursor:pointer;
-    border:2px solid var(--ink);
-    background:var(--ink);
-    color:#fff;
-  }
-  button.secondary{
-    background:#fff;
-    color:var(--ink);
-  }
-  button:disabled{ opacity:0.5; cursor:not-allowed; }
-  button:active{ transform:translateY(1px); }
-  #startBtn{ width:100%; padding:16px; font-size:16px; }
-
-  .save-flash{
-    font-family:'Caveat',cursive;
-    font-size:16px;
-    color:var(--red);
-    font-weight:700;
-    margin-left:4px;
-    opacity:0;
-    transition:opacity .3s;
-  }
-  .save-flash.show{ opacity:1; }
-
-  .stat-row{
-    display:flex;
-    gap:10px;
-    margin-bottom:22px;
-    flex-wrap:wrap;
-  }
-  .stat{
-    flex:1;
-    min-width:100px;
-    background:var(--frame);
-    border:2px solid var(--ink);
-    border-radius:6px;
-    padding:10px 12px;
-  }
-  .stat .num{ font-weight:800; font-size:22px; line-height:1; }
-  .stat .label{
-    font-family:'Caveat',cursive;
-    font-weight:700;
-    font-size:15px;
-    color:var(--body);
-    margin-top:3px;
-    display:block;
-  }
-
-  .track-title{
-    font-family:'Caveat',cursive;
-    font-weight:700;
-    font-size:18px;
-    margin:0 0 8px;
-  }
-  .grid-outer{
-    background:var(--frame);
-    border:2px solid var(--ink);
-    border-radius:6px;
-    padding:14px 12px;
-    margin-bottom:22px;
-  }
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(20, 1fr);
-    gap:3px;
-  }
-  .milestone{
-    grid-column:1 / -1;
-    display:flex;
-    align-items:center;
-    gap:8px;
-    margin:6px 0 4px;
-  }
-  .milestone .line{
-    flex:1; height:1px;
-    background:repeating-linear-gradient(to right, var(--ink) 0 4px, transparent 4px 8px);
-    opacity:0.5;
-  }
-  .milestone .tag{
-    font-family:'Caveat',cursive;
-    font-weight:700;
-    font-size:15px;
-    color:var(--body);
-    white-space:nowrap;
-  }
-  .day-cell{
-    aspect-ratio:1;
-    border-radius:2px;
-    background:#EDEDE7;
-    border:1px solid #DAD6CC;
-    cursor:pointer;
-  }
-  .day-cell.future{ background:transparent; border:1px dashed #DAD6CC; cursor:default; }
-  .day-cell.done{ background:var(--ink); border-color:var(--ink); }
-  .day-cell.missed{ background:#F6E4E4; border-color:#EAC2C2; }
-  .day-cell.today{ background:var(--yellow); border:2px solid var(--red); transform:scale(1.15); }
-  .legend{
-    display:flex; gap:14px; flex-wrap:wrap;
-    margin-top:12px; font-size:12px; color:var(--body);
-  }
-  .legend span{ display:inline-flex; align-items:center; gap:5px; }
-  .legend i{ width:10px;height:10px;border-radius:2px;display:inline-block; }
-
-  .modal-backdrop{
-    position:fixed; inset:0;
-    background:rgba(26,26,26,0.45);
-    display:none;
-    align-items:flex-end;
-    justify-content:center;
-    z-index:50;
-  }
-  .modal-backdrop.open{ display:flex; }
-  .modal{
-    background:var(--bg);
-    width:100%;
-    max-width:640px;
-    border-radius:14px 14px 0 0;
-    padding:18px 16px 24px;
-    border:2px solid var(--ink);
-    border-bottom:none;
-  }
-  .modal-close{
-    display:block;
-    margin:14px auto 0;
-    background:none;
-    border:none;
-    color:var(--body);
-    font-family:'Caveat',cursive;
-    font-size:16px;
-    text-decoration:underline;
-    cursor:pointer;
-  }
-
-  .dembel{
-    background:var(--ink);
-    color:#fff;
-    border-radius:8px;
-    padding:18px 16px 16px;
-    margin-bottom:18px;
-  }
-  .dembel-top{ display:flex; align-items:center; justify-content:center; gap:20px; }
-  .dembel-pct{ display:flex; flex-direction:column; align-items:center; }
-  .pct-num{ font-size:32px; font-weight:800; line-height:1; }
-  .pct-num.left{ color:var(--yellow); }
-  .pct-label{ font-family:'Caveat',cursive; font-size:14px; opacity:0.8; margin-top:4px; }
-  .dembel-divider{ width:2px; height:34px; background:rgba(255,255,255,0.25); }
-  .progress-bar{
-    height:9px; background:rgba(255,255,255,0.18);
-    border-radius:5px; margin-top:16px; overflow:hidden;
-  }
-  .progress-fill{ height:100%; background:var(--red); border-radius:5px; }
-  .finish-line{ margin-top:12px; text-align:center; font-size:13px; opacity:0.9; }
-  .finish-line b{ color:var(--yellow); font-family:'Caveat',cursive; font-size:16px; font-weight:700; }
-
-  .start-card p{ font-size:14px; color:var(--body); line-height:1.5; margin:0 0 4px; }
-
-  .consent-row{
-    display:flex; align-items:flex-start; gap:10px;
-    font-size:12.5px; color:var(--body); line-height:1.5;
-    margin:14px 0;
-  }
-  .consent-row input{ width:18px;height:18px; flex:0 0 18px; margin-top:2px; }
-  .consent-row a{ color:var(--ink); }
-
-  .saved-banner{
-    background:var(--yellow);
-    border:2px solid var(--red);
-    border-radius:8px;
-    padding:12px 14px;
-    font-size:13.5px;
-    line-height:1.5;
-    margin-bottom:18px;
-  }
-  .saved-banner b{ display:block; margin-bottom:4px; }
-
-  footer{
-    text-align:center;
-    margin-top:18px;
-  }
-  .author-link{
-    background:none;
-    border:none;
-    color:#9A9A92;
-    font-size:12.5px;
-    text-decoration:underline;
-    cursor:pointer;
-    padding:6px;
-  }
-
-  .error-box{
-    border:2px solid var(--red);
-    background:#FBEAEA;
-    border-radius:8px;
-    padding:14px;
-    font-size:14px;
-    margin-bottom:18px;
-  }
-  #loadingScreen{ text-align:center; padding:60px 0; color:var(--body); }
+:root{
+  --bg:#FBF6EC; --card-bg:#F4ECDA; --ink:#2B2118; --sub:#8A7C64;
+  --accent:#B6432B; --border:#DDD0B4; --today-fill:#F0D48A; --today-border:#B6432B;
+  --miss-bg:#F3DCD4; --miss-border:#E4BFAF; --path-bg:#E5DAC2; --path-color:#3B6B4A;
+  --font-display:'Caveat',cursive; --font-body:'Manrope',sans-serif;
+  --radius:8px; --input-bg:#fff;
+}
+[data-style="minimal"]{
+  --bg:#FFFFFF; --card-bg:#FFFFFF; --ink:#1C1B18; --sub:#7A756A;
+  --accent:#38477C; --border:#E7E4DC; --today-fill:#FFF3D6; --today-border:#38477C;
+  --miss-bg:#F7EAE8; --miss-border:#E9D3CF; --path-bg:#EDEBE4; --path-color:#38477C;
+  --font-display:'Archivo',sans-serif; --font-body:'IBM Plex Sans',sans-serif;
+  --input-bg:#fff;
+}
+[data-style="dark"]{
+  --bg:#17160F; --card-bg:#201E15; --ink:#EFE9D8; --sub:#9C9483;
+  --accent:#E3A857; --border:#3A382E; --today-fill:#3A2E14; --today-border:#E3A857;
+  --miss-bg:#2D211B; --miss-border:#4A3327; --path-bg:#2A2819; --path-color:#E3A857;
+  --font-display:'Fraunces',serif; --font-body:'Work Sans',sans-serif;
+  --input-bg:#17160F;
+}
+*{box-sizing:border-box;}
+html,body{
+  margin:0; padding:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--font-body);
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{ max-width:640px; margin:0 auto; padding:20px 16px 60px; }
+.eyebrow{ font-family:var(--font-display); font-weight:700; font-size:19px; color:var(--accent); }
+h1{ font-family:var(--font-body); font-weight:800; font-size:26px; line-height:1.15; margin:4px 0 2px; }
+.sub{ font-size:13.5px; color:var(--sub); margin-bottom:18px; }
+.card{ background:var(--bg); border:1px solid var(--border); border-radius:var(--radius); padding:16px; margin-bottom:18px; position:relative; }
+.card .eyebrow-sm{ font-family:var(--font-display); font-weight:700; font-size:16px; color:var(--accent); display:block; margin-bottom:2px; }
+.card h2{ font-family:var(--font-body); font-weight:800; font-size:18px; margin:0 0 12px; }
+.field{ margin-bottom:14px; }
+.field label{ display:block; font-size:12.5px; font-weight:700; color:var(--sub); margin-bottom:5px; }
+input[type=text], input[type=number], select, textarea{
+  width:100%; font-family:var(--font-body); font-size:14px; color:var(--ink);
+  border:1px solid var(--border); border-radius:var(--radius); padding:10px;
+  resize:vertical; background:var(--input-bg);
+}
+textarea{ min-height:44px; }
+textarea:focus, input:focus, select:focus{ outline:2px solid var(--accent); outline-offset:1px; }
+.checkbox-row{
+  display:flex; align-items:flex-start; gap:10px; background:var(--card-bg);
+  border:1px solid var(--border); border-radius:var(--radius); padding:12px; margin-bottom:12px; cursor:pointer;
+}
+.checkbox-row input{ width:19px;height:19px; flex:0 0 19px; margin-top:1px; accent-color:var(--accent); cursor:pointer; }
+.checkbox-row span{ font-weight:600; font-size:13.5px; line-height:1.4; }
+.btn-row{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+button{
+  font-family:var(--font-body); font-weight:700; font-size:13.5px; border-radius:var(--radius);
+  padding:11px 16px; cursor:pointer; border:1px solid var(--accent); background:var(--accent); color:#FBF6EC;
+}
+button.secondary{ background:var(--bg); color:var(--ink); border-color:var(--border); }
+button.danger{ background:var(--bg); color:var(--accent); border-color:var(--accent); }
+button:disabled{ opacity:0.5; cursor:not-allowed; }
+button:active{ transform:translateY(1px); }
+#startBtn{ width:100%; padding:16px; font-size:16px; }
+.save-flash{ font-family:var(--font-display); font-size:15px; color:var(--accent); font-weight:700; margin-left:4px; opacity:0; transition:opacity .3s; }
+.save-flash.show{ opacity:1; }
+.stat-row{ display:flex; gap:10px; margin-bottom:8px; flex-wrap:wrap; }
+.stat{ flex:1; min-width:90px; background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px; }
+.stat .num{ font-weight:800; font-size:20px; line-height:1; }
+.stat .label{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--sub); margin-top:3px; display:block; }
+.track-title{ font-family:var(--font-display); font-weight:700; font-size:17px; margin:0 0 8px; }
+.grid-outer{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 12px; margin-bottom:22px; }
+.grid{ display:grid; grid-template-columns:repeat(20, 1fr); gap:3px; }
+.milestone{ grid-column:1 / -1; display:flex; align-items:center; gap:8px; margin:6px 0 4px; }
+.milestone .line{ flex:1; height:1px; background:repeating-linear-gradient(to right, var(--sub) 0 4px, transparent 4px 8px); opacity:0.5; }
+.milestone .tag{ font-family:var(--font-display); font-weight:700; font-size:14px; color:var(--sub); white-space:nowrap; }
+.day-cell{ aspect-ratio:1; border-radius:3px; background:var(--path-bg); border:1px solid var(--border); cursor:pointer; position:relative; }
+.day-cell.future{ background:transparent; border:1px dashed var(--border); cursor:default; }
+.day-cell.missed{ background:var(--miss-bg); border-color:var(--miss-border); }
+.day-cell.today{ background:var(--today-fill); border:2px solid var(--today-border); transform:scale(1.15); }
+.day-cell.done::after{
+  content:''; position:absolute; inset:24%;
+  background-image:
+    linear-gradient(45deg, transparent 46%, var(--accent) 47.5%, var(--accent) 52.5%, transparent 54%),
+    linear-gradient(-45deg, transparent 46%, var(--accent) 47.5%, var(--accent) 52.5%, transparent 54%);
+}
+.legend{ display:flex; gap:14px; flex-wrap:wrap; margin-top:12px; font-size:11.5px; color:var(--sub); }
+.legend span{ display:inline-flex; align-items:center; gap:5px; }
+.legend i{ width:10px;height:10px;border-radius:2px;display:inline-block; }
+.modal-backdrop{ position:fixed; inset:0; background:rgba(20,16,10,0.45); display:none; align-items:flex-end; justify-content:center; z-index:50; }
+.modal-backdrop.open{ display:flex; }
+.modal{ background:var(--bg); width:100%; max-width:640px; border-radius:14px 14px 0 0; padding:18px 16px 24px; border:1px solid var(--border); border-bottom:none; max-height:88vh; overflow-y:auto; }
+.modal-close{ display:block; margin:14px auto 0; background:none; border:none; color:var(--sub); font-family:var(--font-display); font-size:15px; text-decoration:underline; cursor:pointer; }
+.mountain-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 14px 10px; margin-bottom:18px; }
+.mountain-cap{ display:flex; justify-content:center; font-size:12.5px; color:var(--sub); margin-top:2px; }
+.mountain-cap b{ color:var(--ink); }
+.mountain-sub{ text-align:center; font-size:11.5px; color:var(--sub); margin-top:6px; }
+.mountain-sub b{ font-family:var(--font-display); color:var(--accent); font-size:14px; font-weight:700; }
+.start-card p{ font-size:14px; color:var(--sub); line-height:1.5; margin:0 0 4px; }
+.consent-row{ display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--sub); line-height:1.5; margin:14px 0; }
+.consent-row input{ width:18px;height:18px; flex:0 0 18px; margin-top:2px; }
+.consent-row a{ color:var(--ink); }
+.saved-banner{ background:var(--today-fill); border:1px solid var(--today-border); border-radius:var(--radius); padding:12px 14px; font-size:13px; line-height:1.5; margin-bottom:18px; }
+.saved-banner b{ display:block; margin-bottom:4px; }
+.link-note{ font-size:11.5px; color:var(--sub); background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px; margin-bottom:18px; line-height:1.5; }
+.top-nav{ display:flex; gap:8px; justify-content:flex-end; margin-bottom:6px; }
+.top-nav button{ font-size:12px; padding:7px 11px; }
+footer{ text-align:center; margin-top:18px; }
+.author-link{ background:none; border:none; color:var(--sub); font-size:12px; text-decoration:underline; cursor:pointer; padding:6px; }
+.error-box{ border:1px solid var(--accent); background:var(--miss-bg); border-radius:var(--radius); padding:14px; font-size:14px; margin-bottom:18px; }
+#loadingScreen{ text-align:center; padding:60px 0; color:var(--sub); }
+.notes-item{ border-bottom:1px solid var(--border); padding:10px 0; cursor:pointer; }
+.notes-item:last-child{ border-bottom:none; }
+.notes-item .d{ font-family:var(--font-display); font-weight:700; color:var(--accent); font-size:14px; }
+.notes-item .p{ font-size:13px; margin-top:2px; }
+.notes-item .n{ font-size:13px; color:var(--sub); margin-top:2px; }
+.notes-empty{ font-size:13.5px; color:var(--sub); }
 </style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute">
+<defs>
+<symbol id="hikerIcon" viewBox="0 0 16 22">
+  <circle cx="8" cy="3" r="2.3" fill="none" stroke="currentColor" stroke-width="1.4"/>
+  <rect x="3" y="6.5" width="3.4" height="6" rx="1.3" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <path d="M8 6 L8 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+  <path d="M8 6.5 L4.5 9 L3.5 12.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8 7 L11.5 8 L13 6" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8 13 L5 16 L3.5 19" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M8 13 L11 16 L12.5 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+</symbol>
+</defs>
+</svg>
+
 <div class="wrap">
   <span class="eyebrow">Трекер челленджа</span>
-  <h1 id="pageTitle">Свой трекер на 1000 дней (и не только)</h1>
-  <div class="sub">Пропуск не обнуляет челлендж — просто продолжаешь дальше.</div>
+  <h1 id="pageTitle">Свой трекер</h1>
+  <div class="sub" id="pageSub">Пропуск не обнуляет челлендж — просто продолжаешь дальше.</div>
 
   <div id="loadingScreen">Загрузка…</div>
 
@@ -384,6 +196,14 @@
       <label for="inCheckLabel">Что считается «сделано» в день</label>
       <input type="text" id="inCheckLabel" placeholder="например: тренировка сделана">
     </div>
+    <div class="field">
+      <label for="inStyle">Оформление</label>
+      <select id="inStyle">
+        <option value="paper">Бумажный дневник</option>
+        <option value="minimal">Чистый минимализм</option>
+        <option value="dark">Тёмная студия</option>
+      </select>
+    </div>
 
     <div class="consent-row">
       <input type="checkbox" id="inConsent">
@@ -397,25 +217,24 @@
   <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
   <div id="mainApp" style="display:none">
 
+    <div class="top-nav">
+      <button class="secondary" id="notesNavBtn">Заметки</button>
+      <button class="secondary" id="settingsNavBtn">Настройки</button>
+    </div>
+
     <div class="saved-banner" id="savedBanner" style="display:none">
       <b>Сохраните эту ссылку прямо сейчас</b>
       В Safari нажмите «Поделиться» → «На экран Домой». Это единственный способ вернуться именно к вашему трекеру.
     </div>
 
-    <div class="dembel">
-      <div class="dembel-top">
-        <div class="dembel-pct">
-          <div class="pct-num" id="pctDone">0%</div>
-          <div class="pct-label">пройдено</div>
-        </div>
-        <div class="dembel-divider"></div>
-        <div class="dembel-pct">
-          <div class="pct-num left" id="pctLeft">100%</div>
-          <div class="pct-label">осталось</div>
-        </div>
-      </div>
-      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-      <div class="finish-line">прогноз финиша: <b id="finishDate">—</b></div>
+    <div class="link-note">
+      Эта ссылка — личная. Если переслать её кому-то, он увидит и сможет изменить ваши записи. Ссылка одинаково работает и на телефоне, и на компьютере — просто открывайте её там, где нужно.
+    </div>
+
+    <div class="mountain-card">
+      <div id="mountainSvgHolder"></div>
+      <div class="mountain-cap" id="mountainCap">день 1 из 1</div>
+      <div class="mountain-sub" id="mountainSub">осталось 0 дней · финиш —</div>
     </div>
 
     <div class="stat-row" id="statRow"></div>
@@ -424,10 +243,10 @@
     <div class="grid-outer">
       <div class="grid" id="grid"></div>
       <div class="legend">
-        <span><i style="background:var(--ink)"></i> сделано</span>
-        <span><i style="background:#F6E4E4;border:1px solid #EAC2C2"></i> пропуск</span>
-        <span><i style="background:var(--yellow);border:1px solid var(--red)"></i> сегодня</span>
-        <span><i style="background:transparent;border:1px dashed #DAD6CC"></i> впереди</span>
+        <span><i style="background:var(--path-bg);border:1px solid var(--accent)"></i> сделано</span>
+        <span><i style="background:var(--miss-bg);border:1px solid var(--miss-border)"></i> пропуск</span>
+        <span><i style="background:var(--today-fill);border:1px solid var(--today-border)"></i> сегодня</span>
+        <span><i style="background:transparent;border:1px dashed var(--border)"></i> впереди</span>
       </div>
     </div>
 
@@ -452,6 +271,7 @@
 
       <div class="btn-row">
         <button id="saveBtn">Сохранить день</button>
+        <button class="secondary" id="copyBtn">Скопировать отчёт</button>
         <span class="save-flash" id="saveFlash">записано ✓</span>
       </div>
     </div>
@@ -459,6 +279,47 @@
     <footer>
       <button class="author-link" id="authorLinkBtn">Автор трекера →</button>
     </footer>
+  </div>
+
+  <!-- ЭКРАН ЗАМЕТОК -->
+  <div id="notesScreen" style="display:none">
+    <div class="top-nav"><button class="secondary" id="notesBackBtn">← Назад</button></div>
+    <h2 style="font-family:var(--font-display);font-size:20px;">Все заметки</h2>
+    <div id="notesList"></div>
+  </div>
+
+  <!-- ЭКРАН НАСТРОЕК -->
+  <div id="settingsScreen" style="display:none">
+    <div class="top-nav"><button class="secondary" id="settingsBackBtn">← Назад</button></div>
+    <h2 style="font-family:var(--font-display);font-size:20px;">Настройки трекера</h2>
+
+    <div class="field"><label>Название</label><input type="text" id="stTitle"></div>
+    <div class="field"><label>Ради чего</label><textarea id="stGoal"></textarea></div>
+    <div class="field"><label>Количество дней</label><input type="number" id="stDays" min="1" step="1"></div>
+    <div class="field"><label>Что считается «сделано»</label><input type="text" id="stCheckLabel"></div>
+    <div class="field">
+      <label>Оформление</label>
+      <select id="stStyle">
+        <option value="paper">Бумажный дневник</option>
+        <option value="minimal">Чистый минимализм</option>
+        <option value="dark">Тёмная студия</option>
+      </select>
+    </div>
+    <div class="btn-row">
+      <button id="stSaveBtn">Сохранить изменения</button>
+      <span class="save-flash" id="stFlash"></span>
+    </div>
+
+    <hr style="border:none;border-top:1px solid var(--border);margin:24px 0;">
+
+    <div class="field">
+      <button class="danger" id="stResetBtn">Сбросить все дни</button>
+      <div class="sub" style="margin-top:6px;">Обнулит все записи по дням. Ссылка и настройки останутся прежними.</div>
+    </div>
+    <div class="field">
+      <button class="danger" id="stDeleteBtn">Удалить трекер навсегда</button>
+      <div class="sub" style="margin-top:6px;">Полностью сотрёт трекер. Ссылка перестанет работать.</div>
+    </div>
   </div>
 </div>
 
@@ -485,11 +346,23 @@
   </div>
 </div>
 
+<div class="modal-backdrop" id="confirmBackdrop">
+  <div class="modal">
+    <span class="eyebrow-sm" id="confirmEyebrow">Подтвердите</span>
+    <h2 id="confirmHeading">Вы уверены?</h2>
+    <p id="confirmText" style="font-size:14px;color:var(--sub);line-height:1.5;"></p>
+    <div class="btn-row">
+      <button class="danger" id="confirmYesBtn">Да, продолжить</button>
+      <button class="secondary" id="confirmNoBtn">Отмена</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-backdrop" id="authorBackdrop">
   <div class="modal">
     <span class="eyebrow-sm">Автор трекера</span>
     <h2>Вадим</h2>
-    <p style="font-size:14px;color:var(--body);line-height:1.5;margin:0 0 16px;">
+    <p style="font-size:14px;color:var(--sub);line-height:1.5;margin:0 0 16px;">
       Делаю Launchstats — сервис аналитики для тех, кто продаёт через блог и соцсети,
       и веду блог о его создании. Этот трекер — часть моего собственного 1000-дневного челленджа.
     </p>
@@ -505,7 +378,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import {
-  getFirestore, doc, getDoc, setDoc, addDoc, collection,
+  getFirestore, doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, collection,
   query, orderBy, getDocs, increment, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
@@ -556,6 +429,10 @@ function showError(msg){
   show('errorScreen');
 }
 
+function applyStyle(){
+  document.body.dataset.style = tracker.style || 'paper';
+}
+
 async function init(){
   if(!trackerId){
     hide('loadingScreen');
@@ -575,16 +452,9 @@ async function init(){
     return;
   }
   tracker = trackerSnap.data();
+  applyStyle();
 
-  let entriesSnap;
-  try{
-    entriesSnap = await getDocs(query(collection(db, 'trackers', trackerId, 'entries'), orderBy('day_number')));
-  }catch(e){
-    showError('Не получилось загрузить записи трекера — попробуйте обновить страницу.');
-    return;
-  }
-  entriesByDay = {};
-  entriesSnap.forEach(d => { entriesByDay[d.data().day_number] = d.data(); });
+  await loadEntries();
 
   document.getElementById('pageTitle').textContent = tracker.title;
   document.getElementById('doneLabel').textContent = tracker.checkbox_label;
@@ -594,7 +464,14 @@ async function init(){
   show('mainApp');
   if(isNew){ show('savedBanner'); }
   bindAppScreen();
+  bindSettingsScreen();
   render();
+}
+
+async function loadEntries(){
+  const entriesSnap = await getDocs(query(collection(db, 'trackers', trackerId, 'entries'), orderBy('day_number')));
+  entriesByDay = {};
+  entriesSnap.forEach(d => { entriesByDay[d.data().day_number] = d.data(); });
 }
 
 function bindStartScreen(){
@@ -608,11 +485,12 @@ function bindStartScreen(){
     const days = parseInt(document.getElementById('inDays').value, 10);
     const category = document.getElementById('inCategory').value;
     const checkLabel = document.getElementById('inCheckLabel').value.trim();
+    const style = document.getElementById('inStyle').value;
     const flash = document.getElementById('startFlash');
 
     if(!title || !days || days < 1 || !checkLabel){
       flash.textContent = 'заполните название, дни и «что считается сделано»';
-      flash.style.color = 'var(--red)';
+      flash.style.color = 'var(--accent)';
       flash.classList.add('show');
       setTimeout(()=>flash.classList.remove('show'), 3000);
       return;
@@ -623,7 +501,7 @@ function bindStartScreen(){
     try{
       const docRef = await addDoc(collection(db, 'trackers'), {
         title, goal: goal || null, target_days: days,
-        checkbox_label: checkLabel, category,
+        checkbox_label: checkLabel, category, style,
         start_date: dateStr(new Date()),
         created_at: serverTimestamp()
       });
@@ -632,7 +510,7 @@ function bindStartScreen(){
       await setDoc(doc(db, 'stats', 'categories'), { [category]: increment(1) }, { merge: true });
     }catch(e){
       flash.textContent = 'не получилось создать — попробуйте ещё раз';
-      flash.style.color = 'var(--red)';
+      flash.style.color = 'var(--accent)';
       flash.classList.add('show');
       startBtn.disabled = false;
       startBtn.textContent = 'Начать челлендж';
@@ -647,11 +525,17 @@ function bindStartScreen(){
 
 function bindAppScreen(){
   document.getElementById('saveBtn').addEventListener('click', saveToday);
+  document.getElementById('copyBtn').addEventListener('click', copyTodayReport);
   document.getElementById('modalSaveBtn').addEventListener('click', saveModalDay);
   document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
   document.getElementById('modalBackdrop').addEventListener('click', (ev)=>{
     if(ev.target.id==='modalBackdrop') closeModal();
   });
+
+  document.getElementById('notesNavBtn').addEventListener('click', openNotes);
+  document.getElementById('notesBackBtn').addEventListener('click', closeNotes);
+  document.getElementById('settingsNavBtn').addEventListener('click', openSettings);
+  document.getElementById('settingsBackBtn').addEventListener('click', closeSettings);
 
   const authorBtn = document.getElementById('authorLinkBtn');
   const authorBackdrop = document.getElementById('authorBackdrop');
@@ -674,29 +558,69 @@ function logClick(eventType){
   setDoc(doc(db, 'stats', 'clicks'), { [eventType]: increment(1) }, { merge: true }).catch(()=>{});
 }
 
-function render(){
-  const totalDays = tracker.target_days;
+function computeTotals(){
+  const targetDays = tracker.target_days;
   const rawToday = todayDayNumber();
-  const today = Math.min(totalDays, rawToday);
-
   const doneCount = Object.values(entriesByDay).filter(e=>e.done).length;
-  const remaining = Math.max(0, totalDays - doneCount);
-  const pctDone = Math.round((doneCount/totalDays)*100);
-  const pctLeft = 100 - pctDone;
+  const missedSoFar = Math.max(0, (rawToday-1) - doneCount);
+  const totalSlots = Math.max(targetDays + missedSoFar, rawToday);
+  return { targetDays, rawToday, doneCount, totalSlots };
+}
 
-  document.getElementById('pctDone').textContent = pctDone + '%';
-  document.getElementById('pctLeft').textContent = pctLeft + '%';
-  document.getElementById('progressFill').style.width = pctDone + '%';
-
-  const finishEl = document.getElementById('finishDate');
-  if(remaining<=0){
-    finishEl.textContent = 'челлендж пройден 🎉';
-  } else {
-    const now = new Date();
-    now.setHours(0,0,0,0);
-    const finish = new Date(now.getTime() + remaining*86400000);
-    finishEl.textContent = finish.toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+function buildMountainPath(totalSlots){
+  const width = 300, height = 84, padTop = 8, padBottom = 12;
+  const pts = [];
+  for(let i=0;i<=totalSlots;i++){
+    const t = i/totalSlots;
+    const trend = (height-padBottom) - t*(height-padBottom-padTop);
+    const wave = Math.sin(i*0.85)*9 + Math.sin(i*0.33+1)*6;
+    let y = trend + wave;
+    y = Math.max(padTop, Math.min(height-padBottom, y));
+    const x = t*(width-8)+4;
+    pts.push([x,y]);
   }
+  return { pts, width, height };
+}
+
+function renderMountain(){
+  const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
+  const { pts, width, height } = buildMountainPath(totalSlots);
+
+  const fullD = 'M' + pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
+  const donePts = pts.slice(0, doneCount+1);
+  const doneD = donePts.length>1 ? 'M' + donePts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') : '';
+  const hikerPt = pts[doneCount] || pts[0];
+  const flagPt = pts[pts.length-1];
+
+  const svg = `
+    <svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
+      <path d="${fullD}" fill="none" stroke="var(--border)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      ${doneD ? `<path d="${doneD}" fill="none" stroke="var(--path-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+      <g transform="translate(${(hikerPt[0]-8).toFixed(1)} ${(hikerPt[1]-20).toFixed(1)})" style="color:var(--ink)">
+        <use href="#hikerIcon" width="16" height="22"/>
+      </g>
+      <text x="${(flagPt[0]-8).toFixed(1)}" y="${(flagPt[1]-6).toFixed(1)}" font-size="13">🏁</text>
+    </svg>
+  `;
+  document.getElementById('mountainSvgHolder').innerHTML = svg;
+  document.getElementById('mountainCap').innerHTML = `день <b>${rawToday}</b> из ${totalSlots}`;
+
+  const remaining = Math.max(0, targetDays - doneCount);
+  let finishText;
+  if(remaining<=0){
+    finishText = 'челлендж пройден 🎉';
+  } else {
+    const now = new Date(); now.setHours(0,0,0,0);
+    const finish = new Date(now.getTime() + remaining*86400000);
+    finishText = 'финиш ' + finish.toLocaleDateString('ru-RU', {day:'numeric', month:'long'});
+  }
+  document.getElementById('mountainSub').innerHTML = `осталось <b>${remaining}</b> дней &middot; ${finishText}`;
+}
+
+function render(){
+  const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
+
+  renderMountain();
 
   let streak = 0;
   for(let n=rawToday; n>=1; n--){
@@ -706,13 +630,13 @@ function render(){
   }
   document.getElementById('statRow').innerHTML = `
     <div class="stat"><div class="num">${rawToday}</div><span class="label">текущий день</span></div>
-    <div class="stat"><div class="num">${doneCount}/${totalDays}</div><span class="label">сделано</span></div>
+    <div class="stat"><div class="num">${doneCount}/${targetDays}</div><span class="label">сделано</span></div>
     <div class="stat"><div class="num">${streak}</div><span class="label">серия подряд</span></div>
   `;
 
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  for(let n=1; n<=totalDays; n++){
+  for(let n=1; n<=totalSlots; n++){
     if(n>1 && (n-1)%100===0){
       const m = document.createElement('div');
       m.className = 'milestone';
@@ -734,11 +658,11 @@ function render(){
   }
   const finish = document.createElement('div');
   finish.className = 'milestone';
-  finish.innerHTML = `<div class="line"></div><span class="tag">${totalDays} 🏁</span><div class="line"></div>`;
+  finish.innerHTML = `<div class="line"></div><span class="tag">${totalSlots} 🏁</span><div class="line"></div>`;
   grid.appendChild(finish);
 
   const t = entriesByDay[rawToday] || {done:false, plan:'', note:''};
-  document.getElementById('todayHeading').textContent = `День ${rawToday} из ${totalDays}`;
+  document.getElementById('todayHeading').textContent = `День ${rawToday} из ${totalSlots}`;
   document.getElementById('todayEyebrow').textContent = fmtDate(isoForDayNumber(rawToday));
   document.getElementById('doneCheck').checked = !!t.done;
   document.getElementById('planInput').value = t.plan || '';
@@ -766,16 +690,44 @@ async function saveToday(){
     flash.style.color = '';
   } else {
     flash.textContent = 'не сохранилось — нажми ещё раз';
-    flash.style.color = 'var(--red)';
+    flash.style.color = 'var(--accent)';
   }
   flash.classList.add('show');
   setTimeout(()=>flash.classList.remove('show'), error ? 3500 : 1500);
 }
 
+function buildReportText(n){
+  const e = entriesByDay[n] || {done:false, plan:'', note:''};
+  const iso = isoForDayNumber(n);
+  return [
+    `${tracker.title} — день ${n}`,
+    `${fmtDate(iso)}`,
+    `${e.done ? '✅' : '❌'} ${tracker.checkbox_label}`,
+    `План на завтра: ${e.plan || '—'}`,
+    `Заметка дня: ${e.note || '—'}`
+  ].join('\n');
+}
+
+async function copyTodayReport(){
+  await saveToday();
+  const today = todayDayNumber();
+  const text = buildReportText(today);
+  const btn = document.getElementById('copyBtn');
+  const original = btn.textContent;
+  try{
+    await navigator.clipboard.writeText(text);
+    btn.textContent = 'Скопировано ✓';
+  }catch(e){
+    alert(text);
+    btn.textContent = original;
+  }
+  setTimeout(()=>{ btn.textContent = original; }, 2000);
+}
+
 function openDay(n){
   selectedDay = n;
   const e = entriesByDay[n] || {done:false, plan:'', note:''};
-  document.getElementById('modalHeading').textContent = `День ${n} из ${tracker.target_days}`;
+  document.getElementById('modalHeading').textContent = `День ${n}`;
   document.getElementById('modalEyebrow').textContent = fmtDate(isoForDayNumber(n));
   document.getElementById('modalDoneCheck').checked = !!e.done;
   document.getElementById('modalPlanInput').value = e.plan || '';
@@ -806,7 +758,131 @@ function closeModal(){
   selectedDay = null;
 }
 
+function openNotes(){
+  const list = document.getElementById('notesList');
+  const days = Object.keys(entriesByDay).map(Number)
+    .filter(n => (entriesByDay[n].plan || entriesByDay[n].note))
+    .sort((a,b)=>b-a);
+  if(days.length===0){
+    list.innerHTML = '<div class="notes-empty">Пока нет заметок — заполняйте поля «План на завтра» и «Заметка дня» на главном экране.</div>';
+  } else {
+    list.innerHTML = days.map(n => {
+      const e = entriesByDay[n];
+      return `<div class="notes-item" data-day="${n}">
+        <div class="d">День ${n} — ${fmtDate(isoForDayNumber(n))}</div>
+        ${e.plan ? `<div class="p">План: ${escapeHtml(e.plan)}</div>` : ''}
+        ${e.note ? `<div class="n">${escapeHtml(e.note)}</div>` : ''}
+      </div>`;
+    }).join('');
+    list.querySelectorAll('.notes-item').forEach(el => {
+      el.addEventListener('click', () => { closeNotes(); openDay(Number(el.dataset.day)); });
+    });
+  }
+  hide('mainApp');
+  show('notesScreen');
+}
+function closeNotes(){ hide('notesScreen'); show('mainApp'); }
+
+function escapeHtml(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function openSettings(){
+  document.getElementById('stTitle').value = tracker.title;
+  document.getElementById('stGoal').value = tracker.goal || '';
+  document.getElementById('stDays').value = tracker.target_days;
+  document.getElementById('stCheckLabel').value = tracker.checkbox_label;
+  document.getElementById('stStyle').value = tracker.style || 'paper';
+  hide('mainApp');
+  show('settingsScreen');
+}
+function closeSettings(){ hide('settingsScreen'); show('mainApp'); }
+
+function bindSettingsScreen(){
+  document.getElementById('stSaveBtn').addEventListener('click', async () => {
+    const flash = document.getElementById('stFlash');
+    const title = document.getElementById('stTitle').value.trim();
+    const goal = document.getElementById('stGoal').value.trim();
+    const days = parseInt(document.getElementById('stDays').value, 10);
+    const checkLabel = document.getElementById('stCheckLabel').value.trim();
+    const style = document.getElementById('stStyle').value;
+    if(!title || !days || days<1 || !checkLabel){
+      flash.textContent = 'заполните все обязательные поля';
+      flash.style.color = 'var(--accent)';
+      flash.classList.add('show');
+      setTimeout(()=>flash.classList.remove('show'), 3000);
+      return;
+    }
+    try{
+      await updateDoc(doc(db, 'trackers', trackerId), {
+        title, goal: goal || null, target_days: days, checkbox_label: checkLabel, style
+      });
+      tracker.title = title; tracker.goal = goal; tracker.target_days = days;
+      tracker.checkbox_label = checkLabel; tracker.style = style;
+      applyStyle();
+      document.getElementById('pageTitle').textContent = title;
+      document.getElementById('doneLabel').textContent = checkLabel;
+      document.getElementById('modalDoneLabel').textContent = checkLabel;
+      render();
+      flash.textContent = 'сохранено ✓';
+      flash.style.color = '';
+    }catch(e){
+      flash.textContent = 'не сохранилось — попробуйте ещё раз';
+      flash.style.color = 'var(--accent)';
+    }
+    flash.classList.add('show');
+    setTimeout(()=>flash.classList.remove('show'), 2000);
+  });
+
+  document.getElementById('stResetBtn').addEventListener('click', () => {
+    askConfirm(
+      'Сбросить все дни?',
+      'Все отметки, планы и заметки будут удалены без возможности восстановить. Ссылка и настройки трекера останутся прежними.',
+      async () => {
+        const days = Object.keys(entriesByDay);
+        for(const n of days){
+          try{ await deleteDoc(doc(db, 'trackers', trackerId, 'entries', n)); }catch(e){}
+        }
+        entriesByDay = {};
+        closeSettings();
+        render();
+      }
+    );
+  });
+
+  document.getElementById('stDeleteBtn').addEventListener('click', () => {
+    askConfirm(
+      'Удалить трекер навсегда?',
+      'Трекер и все записи будут удалены без возможности восстановить. Эта ссылка перестанет работать.',
+      async () => {
+        try{ await deleteDoc(doc(db, 'trackers', trackerId)); }catch(e){}
+        window.location.href = window.location.pathname;
+      }
+    );
+  });
+}
+
+function askConfirm(title, text, onYes){
+  document.getElementById('confirmHeading').textContent = title;
+  document.getElementById('confirmText').textContent = text;
+  const backdrop = document.getElementById('confirmBackdrop');
+  backdrop.classList.add('open');
+  const yesBtn = document.getElementById('confirmYesBtn');
+  const noBtn = document.getElementById('confirmNoBtn');
+  const cleanup = () => {
+    backdrop.classList.remove('open');
+    yesBtn.replaceWith(yesBtn.cloneNode(true));
+    noBtn.replaceWith(noBtn.cloneNode(true));
+  };
+  document.getElementById('confirmYesBtn').addEventListener('click', () => { cleanup(); onYes(); }, {once:true});
+  document.getElementById('confirmNoBtn').addEventListener('click', cleanup, {once:true});
+}
+
 init();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 </script>
 
 </body>

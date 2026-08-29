@@ -1,0 +1,14 @@
+{
+  "name": "Трекер челленджа",
+  "short_name": "Трекер",
+  "description": "Личный трекер челленджа — отмечай дни, план и заметки.",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#FBF6EC",
+  "theme_color": "#2B2118",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}
