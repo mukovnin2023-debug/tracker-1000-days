@@ -567,97 +567,42 @@ function computeTotals(){
   return { targetDays, rawToday, doneCount, totalSlots };
 }
 
-function seededRandom(n){
-  const x = Math.sin(n*12.9898)*43758.5453;
-  return x - Math.floor(x);
-}
+// Точные точки утверждённого макета (витрина, вариант "Лесной зелёный") — не менять форму.
+const MOUNTAIN_RIDGE = [[0,46],[24,58],[46,24],[70,44],[92,30],[112,50]];
+const MOUNTAIN_LAYER1 = "M0 80 L0 46 L24 58 L46 24 L70 44 L92 30 L112 50 L130 80 Z";
+const MOUNTAIN_LAYER2 = "M60 80 L60 50 L84 62 L104 26 L126 42 L150 8 L172 34 L190 20 L206 80 Z";
+const MOUNTAIN_LAYER3 = "M170 80 L170 44 L192 56 L214 12 L234 36 L256 22 L256 80 Z";
+const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 80;
 
-function buildMountainVertices(totalSlots){
-  const width = 300, height = 84, padTop = 10, padBottom = 14;
-  const range = height - padTop - padBottom;
-  const days = [0];
-  let i = 0;
-  while(i < totalSlots){
-    const step = 3 + Math.floor(seededRandom(i*7.31+3) * 5);
-    i = Math.min(totalSlots, i + Math.max(1, step));
-    days.push(i);
-  }
-  if(days[days.length-1] !== totalSlots) days.push(totalSlots);
-
-  const vertices = days.map(d => {
-    const t = totalSlots ? d/totalSlots : 0;
-    const trendY = (height-padBottom) - t*range;
-    const amp = (seededRandom(d*3.17+1) - 0.5) * range * 0.55;
-    let y = Math.max(padTop, Math.min(height-padBottom, trendY + amp));
-    const x = t*(width-8) + 4;
-    return { x, y, d };
-  });
-  return { vertices, width, height };
-}
-
-function pointAtDay(vertices, dayIndex){
-  for(let k=0;k<vertices.length-1;k++){
-    const a = vertices[k], b = vertices[k+1];
-    if(dayIndex>=a.d && dayIndex<=b.d){
-      const t = b.d===a.d ? 0 : (dayIndex-a.d)/(b.d-a.d);
-      return { x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t };
-    }
-  }
-  const last = vertices[vertices.length-1];
-  return { x:last.x, y:last.y };
-}
-
-function buildFarRidge(totalSlots, width, height){
-  const padTop = 26, padBottom = 6;
-  const range = height - padTop - padBottom;
-  const pts = [];
-  const steps = Math.max(4, Math.round(totalSlots/6));
-  for(let k=0;k<=steps;k++){
-    const t = k/steps;
-    const trendY = (height-padBottom) - t*range*0.5;
-    const amp = (seededRandom(k*5.53+9) - 0.5) * range * 0.7;
-    const y = Math.max(padTop, Math.min(height-padBottom, trendY + amp));
-    const x = t*(width-8) + 4;
-    pts.push([x,y]);
-  }
-  return pts;
-}
-
-function closedPolygon(pts, height){
-  const first = pts[0], last = pts[pts.length-1];
-  return 'M' + first[0].toFixed(1) + ' ' + height + ' L ' +
-    pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') +
-    ' L ' + last[0].toFixed(1) + ' ' + height + ' Z';
+function pointAlongRidge(pct){
+  const ridge = MOUNTAIN_RIDGE;
+  const totalLen = ridge.length - 1;
+  const pos = Math.max(0, Math.min(1, pct)) * totalLen;
+  const k = Math.min(Math.floor(pos), totalLen-1);
+  const t = pos - k;
+  const a = ridge[k], b = ridge[k+1];
+  return { x: a[0]+(b[0]-a[0])*t, y: a[1]+(b[1]-a[1])*t, index:k, t };
 }
 
 function renderMountain(){
   const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
-  const { vertices, width, height } = buildMountainVertices(totalSlots);
+  const pct = totalSlots ? doneCount/totalSlots : 0;
+  const hikerPoint = pointAlongRidge(pct);
 
-  const nearPts = vertices.map(p=>[p.x,p.y]);
-  const farPts = buildFarRidge(totalSlots, width, height);
-  const farD = closedPolygon(farPts, height);
-  const nearFillD = closedPolygon(nearPts, height);
-
-  const doneVerts = vertices.filter(v => v.d <= doneCount).map(v=>[v.x.toFixed(1), v.y.toFixed(1)]);
-  const hikerPoint = pointAtDay(vertices, doneCount);
-  const alreadyAtVertex = doneVerts.length && Number(doneVerts[doneVerts.length-1][0]) === Number(hikerPoint.x.toFixed(1));
-  const doneCoords = alreadyAtVertex ? doneVerts : [...doneVerts, [hikerPoint.x.toFixed(1), hikerPoint.y.toFixed(1)]];
-  const doneD = doneCoords.length>1 ? 'M' + doneCoords.map(p=>p[0]+' '+p[1]).join(' L ') : '';
-
-  const hikerPt = [hikerPoint.x, hikerPoint.y];
-  const lastVertex = vertices[vertices.length-1];
-  const flagPt = [lastVertex.x, lastVertex.y];
+  const ridgePts = MOUNTAIN_RIDGE.slice(0, hikerPoint.index+1);
+  ridgePts.push([hikerPoint.x, hikerPoint.y]);
+  const doneD = ridgePts.length>1 ? 'M' + ridgePts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') : '';
 
   const svg = `
-    <svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
-      <path d="${farD}" fill="var(--ridge-far)"/>
-      <path d="${nearFillD}" fill="var(--path-bg)"/>
+    <svg viewBox="0 0 ${MOUNTAIN_WIDTH} ${MOUNTAIN_HEIGHT}" width="100%" height="${MOUNTAIN_HEIGHT}">
+      <path d="${MOUNTAIN_LAYER1}" fill="var(--ridge-far)"/>
+      <path d="${MOUNTAIN_LAYER2}" fill="var(--path-bg)"/>
+      <path d="${MOUNTAIN_LAYER3}" fill="var(--border)"/>
       ${doneD ? `<path d="${doneD}" fill="none" stroke="var(--path-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
-      <g transform="translate(${(hikerPt[0]-8).toFixed(1)} ${(hikerPt[1]-20).toFixed(1)})" style="color:var(--ink)">
+      <g transform="translate(${(hikerPoint.x-8).toFixed(1)} ${(hikerPoint.y-20).toFixed(1)})" style="color:var(--ink)">
         <use href="#hikerIcon" width="16" height="22"/>
       </g>
-      <text x="${(flagPt[0]-8).toFixed(1)}" y="${(flagPt[1]-6).toFixed(1)}" font-size="13">🏁</text>
+      <text x="246" y="12" font-size="13">🏁</text>
     </svg>
   `;
   document.getElementById('mountainSvgHolder').innerHTML = svg;
