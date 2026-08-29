@@ -12,7 +12,6 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg: #FDFDFB;
@@ -503,10 +502,23 @@
   </div>
 </div>
 
-<script>
-const SUPABASE_URL = 'https://wvvvkgvxvbmznztqknzrp.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_WFq8oMP5Z77-4mQCgCFrnQ_JJfHliD7';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore, doc, getDoc, setDoc, addDoc, collection,
+  query, orderBy, getDocs, increment, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDM5zsOLzX7Pv7YAA9VPW0d9zVdwVwSKxs",
+  authDomain: "tracker-1000-ed42a.firebaseapp.com",
+  projectId: "tracker-1000-ed42a",
+  storageBucket: "tracker-1000-ed42a.firebasestorage.app",
+  messagingSenderId: "292947247763",
+  appId: "1:292947247763:web:11931f037bea33f3584366"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 const params = new URLSearchParams(window.location.search);
 let trackerId = params.get('id');
@@ -551,23 +563,28 @@ async function init(){
     bindStartScreen();
     return;
   }
-  const { data, error } = await sb.rpc('get_tracker', { p_id: trackerId });
-  if(error || !data){
+  let trackerSnap;
+  try{
+    trackerSnap = await getDoc(doc(db, 'trackers', trackerId));
+  }catch(e){
     showError('Не получилось загрузить трекер — попробуйте обновить страницу.');
     return;
   }
-  tracker = Array.isArray(data) ? data[0] : data;
-  if(!tracker){
+  if(!trackerSnap.exists()){
     showError('Трекер по этой ссылке не найден. Проверьте, что ссылка скопирована полностью.');
     return;
   }
-  const { data: entriesData, error: entriesError } = await sb.rpc('get_entries', { p_tracker_id: trackerId });
-  if(entriesError){
+  tracker = trackerSnap.data();
+
+  let entriesSnap;
+  try{
+    entriesSnap = await getDocs(query(collection(db, 'trackers', trackerId, 'entries'), orderBy('day_number')));
+  }catch(e){
     showError('Не получилось загрузить записи трекера — попробуйте обновить страницу.');
     return;
   }
   entriesByDay = {};
-  (entriesData || []).forEach(e => { entriesByDay[e.day_number] = e; });
+  entriesSnap.forEach(d => { entriesByDay[d.data().day_number] = d.data(); });
 
   document.getElementById('pageTitle').textContent = tracker.title;
   document.getElementById('doneLabel').textContent = tracker.checkbox_label;
@@ -602,11 +619,18 @@ function bindStartScreen(){
     }
     startBtn.disabled = true;
     startBtn.textContent = 'Создаю…';
-    const { data, error } = await sb.rpc('create_tracker', {
-      p_title: title, p_goal: goal || null, p_target_days: days,
-      p_checkbox_label: checkLabel, p_category: category
-    });
-    if(error || !data){
+    let newId;
+    try{
+      const docRef = await addDoc(collection(db, 'trackers'), {
+        title, goal: goal || null, target_days: days,
+        checkbox_label: checkLabel, category,
+        start_date: dateStr(new Date()),
+        created_at: serverTimestamp()
+      });
+      newId = docRef.id;
+      await setDoc(doc(db, 'stats', 'totals'), { trackers: increment(1) }, { merge: true });
+      await setDoc(doc(db, 'stats', 'categories'), { [category]: increment(1) }, { merge: true });
+    }catch(e){
       flash.textContent = 'не получилось создать — попробуйте ещё раз';
       flash.style.color = 'var(--red)';
       flash.classList.add('show');
@@ -614,7 +638,6 @@ function bindStartScreen(){
       startBtn.textContent = 'Начать челлендж';
       return;
     }
-    const newId = data;
     const url = new URL(window.location.href);
     url.searchParams.set('id', newId);
     url.searchParams.set('new', '1');
@@ -633,7 +656,7 @@ function bindAppScreen(){
   const authorBtn = document.getElementById('authorLinkBtn');
   const authorBackdrop = document.getElementById('authorBackdrop');
   authorBtn.addEventListener('click', () => {
-    sb.rpc('log_click', { p_event_type: 'author_open' });
+    logClick('author_open');
     authorBackdrop.classList.add('open');
   });
   document.getElementById('authorCloseBtn').addEventListener('click', () => {
@@ -643,8 +666,12 @@ function bindAppScreen(){
     if(ev.target.id==='authorBackdrop') authorBackdrop.classList.remove('open');
   });
   document.getElementById('instagramLink').addEventListener('click', () => {
-    sb.rpc('log_click', { p_event_type: 'instagram_click' });
+    logClick('instagram_click');
   });
+}
+
+function logClick(eventType){
+  setDoc(doc(db, 'stats', 'clicks'), { [eventType]: increment(1) }, { merge: true }).catch(()=>{});
 }
 
 function render(){
@@ -725,9 +752,13 @@ async function saveToday(){
   const note = document.getElementById('noteInput').value;
   const flash = document.getElementById('saveFlash');
 
-  const { error } = await sb.rpc('upsert_entry', {
-    p_tracker_id: trackerId, p_day: today, p_done: done, p_plan: plan, p_note: note
-  });
+  let error = null;
+  try{
+    await setDoc(doc(db, 'trackers', trackerId, 'entries', String(today)), {
+      day_number: today, done, plan, note, updated_at: serverTimestamp()
+    });
+  }catch(e){ error = e; }
+
   if(!error){
     entriesByDay[today] = { day_number: today, done, plan, note };
     render();
@@ -758,14 +789,14 @@ async function saveModalDay(){
   const plan = document.getElementById('modalPlanInput').value;
   const note = document.getElementById('modalNoteInput').value;
 
-  const { error } = await sb.rpc('upsert_entry', {
-    p_tracker_id: trackerId, p_day: selectedDay, p_done: done, p_plan: plan, p_note: note
-  });
-  if(!error){
+  try{
+    await setDoc(doc(db, 'trackers', trackerId, 'entries', String(selectedDay)), {
+      day_number: selectedDay, done, plan, note, updated_at: serverTimestamp()
+    });
     entriesByDay[selectedDay] = { day_number: selectedDay, done, plan, note };
     render();
     closeModal();
-  } else {
+  } catch(e) {
     alert('Не удалось сохранить — проверьте соединение и нажмите «Сохранить» ещё раз.');
   }
 }

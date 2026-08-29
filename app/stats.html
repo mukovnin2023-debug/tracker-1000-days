@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Статистика — Трекер челленджа</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   body{
     max-width:640px; margin:0 auto; padding:24px 16px 60px;
@@ -29,32 +28,46 @@
 <h1>Статистика трекера (только для автора)</h1>
 <div id="content">Загрузка…</div>
 
-<script>
-const SUPABASE_URL = 'https://wvvvkgvxvbmznztqknzrp.supabase.co';
-const SUPABASE_KEY = 'sb_publishable_WFq8oMP5Z77-4mQCgCFrnQ_JJfHliD7';
-const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDM5zsOLzX7Pv7YAA9VPW0d9zVdwVwSKxs",
+  authDomain: "tracker-1000-ed42a.firebaseapp.com",
+  projectId: "tracker-1000-ed42a",
+  storageBucket: "tracker-1000-ed42a.firebasestorage.app",
+  messagingSenderId: "292947247763",
+  appId: "1:292947247763:web:11931f037bea33f3584366"
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
 async function load(){
-  const [{ data: total }, { data: categories }, { data: clicks }] = await Promise.all([
-    sb.rpc('get_total_trackers'),
-    sb.rpc('get_category_stats'),
-    sb.rpc('get_click_stats')
+  const [totalsSnap, categoriesSnap, clicksSnap] = await Promise.all([
+    getDoc(doc(db, 'stats', 'totals')),
+    getDoc(doc(db, 'stats', 'categories')),
+    getDoc(doc(db, 'stats', 'clicks'))
   ]);
 
-  const authorOpen = (clicks || []).find(c => c.event_type === 'author_open')?.cnt || 0;
-  const instagramClick = (clicks || []).find(c => c.event_type === 'instagram_click')?.cnt || 0;
+  const total = totalsSnap.exists() ? (totalsSnap.data().trackers || 0) : 0;
+  const categories = categoriesSnap.exists() ? categoriesSnap.data() : {};
+  const clicks = clicksSnap.exists() ? clicksSnap.data() : {};
+  const authorOpen = clicks.author_open || 0;
+  const instagramClick = clicks.instagram_click || 0;
 
-  const maxCat = Math.max(1, ...(categories || []).map(c => Number(c.cnt)));
-  const catRows = (categories || []).map(c => {
-    const pct = total ? Math.round((c.cnt/total)*100) : 0;
-    const barPct = Math.round((c.cnt/maxCat)*100);
-    return `<div class="row"><span>${c.category}</span><span>${c.cnt} (${pct}%)</span></div>
+  const catEntries = Object.entries(categories).sort((a,b) => b[1]-a[1]);
+  const maxCat = Math.max(1, ...catEntries.map(c => c[1]));
+  const catRows = catEntries.map(([name, cnt]) => {
+    const pct = total ? Math.round((cnt/total)*100) : 0;
+    const barPct = Math.round((cnt/maxCat)*100);
+    return `<div class="row"><span>${name}</span><span>${cnt} (${pct}%)</span></div>
             <div class="bar-outer"><div class="bar-inner" style="width:${barPct}%"></div></div>`;
   }).join('');
 
   document.getElementById('content').innerHTML = `
     <div class="totals">
-      <div><div class="num">${total || 0}</div><div class="label">всего трекеров создано</div></div>
+      <div><div class="num">${total}</div><div class="label">всего трекеров создано</div></div>
       <div><div class="num">${authorOpen}</div><div class="label">открыли «Автор трекера»</div></div>
       <div><div class="num">${instagramClick}</div><div class="label">перешли в Instagram</div></div>
     </div>
