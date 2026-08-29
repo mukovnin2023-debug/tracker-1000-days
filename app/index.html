@@ -20,21 +20,21 @@
 :root{
   --bg:#FBF6EC; --card-bg:#F4ECDA; --ink:#2B2118; --sub:#8A7C64;
   --accent:#B6432B; --border:#DDD0B4; --today-fill:#F0D48A; --today-border:#B6432B;
-  --miss-bg:#F3DCD4; --miss-border:#E4BFAF; --path-bg:#E5DAC2; --path-color:#3B6B4A;
+  --miss-bg:#F3DCD4; --miss-border:#E4BFAF; --path-bg:#E5DAC2; --ridge-far:#EDE2C8; --path-color:#3B6B4A;
   --font-display:'Caveat',cursive; --font-body:'Manrope',sans-serif;
   --radius:8px; --input-bg:#fff;
 }
 [data-style="minimal"]{
   --bg:#FFFFFF; --card-bg:#FFFFFF; --ink:#1C1B18; --sub:#7A756A;
   --accent:#38477C; --border:#E7E4DC; --today-fill:#FFF3D6; --today-border:#38477C;
-  --miss-bg:#F7EAE8; --miss-border:#E9D3CF; --path-bg:#EDEBE4; --path-color:#38477C;
+  --miss-bg:#F7EAE8; --miss-border:#E9D3CF; --path-bg:#EDEBE4; --ridge-far:#F5F4F0; --path-color:#38477C;
   --font-display:'Archivo',sans-serif; --font-body:'IBM Plex Sans',sans-serif;
   --input-bg:#fff;
 }
 [data-style="dark"]{
   --bg:#17160F; --card-bg:#201E15; --ink:#EFE9D8; --sub:#9C9483;
   --accent:#E3A857; --border:#3A382E; --today-fill:#3A2E14; --today-border:#E3A857;
-  --miss-bg:#2D211B; --miss-border:#4A3327; --path-bg:#2A2819; --path-color:#E3A857;
+  --miss-bg:#2D211B; --miss-border:#4A3327; --path-bg:#2A2819; --ridge-far:#221F16; --path-color:#E3A857;
   --font-display:'Fraunces',serif; --font-body:'Work Sans',sans-serif;
   --input-bg:#17160F;
 }
@@ -607,11 +607,37 @@ function pointAtDay(vertices, dayIndex){
   return { x:last.x, y:last.y };
 }
 
+function buildFarRidge(totalSlots, width, height){
+  const padTop = 26, padBottom = 6;
+  const range = height - padTop - padBottom;
+  const pts = [];
+  const steps = Math.max(4, Math.round(totalSlots/6));
+  for(let k=0;k<=steps;k++){
+    const t = k/steps;
+    const trendY = (height-padBottom) - t*range*0.5;
+    const amp = (seededRandom(k*5.53+9) - 0.5) * range * 0.7;
+    const y = Math.max(padTop, Math.min(height-padBottom, trendY + amp));
+    const x = t*(width-8) + 4;
+    pts.push([x,y]);
+  }
+  return pts;
+}
+
+function closedPolygon(pts, height){
+  const first = pts[0], last = pts[pts.length-1];
+  return 'M' + first[0].toFixed(1) + ' ' + height + ' L ' +
+    pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') +
+    ' L ' + last[0].toFixed(1) + ' ' + height + ' Z';
+}
+
 function renderMountain(){
   const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
   const { vertices, width, height } = buildMountainVertices(totalSlots);
 
-  const fullD = 'M' + vertices.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L ');
+  const nearPts = vertices.map(p=>[p.x,p.y]);
+  const farPts = buildFarRidge(totalSlots, width, height);
+  const farD = closedPolygon(farPts, height);
+  const nearFillD = closedPolygon(nearPts, height);
 
   const doneVerts = vertices.filter(v => v.d <= doneCount).map(v=>[v.x.toFixed(1), v.y.toFixed(1)]);
   const hikerPoint = pointAtDay(vertices, doneCount);
@@ -625,7 +651,8 @@ function renderMountain(){
 
   const svg = `
     <svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
-      <path d="${fullD}" fill="none" stroke="var(--border)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="${farD}" fill="var(--ridge-far)"/>
+      <path d="${nearFillD}" fill="var(--path-bg)"/>
       ${doneD ? `<path d="${doneD}" fill="none" stroke="var(--path-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
       <g transform="translate(${(hikerPt[0]-8).toFixed(1)} ${(hikerPt[1]-20).toFixed(1)})" style="color:var(--ink)">
         <use href="#hikerIcon" width="16" height="22"/>
