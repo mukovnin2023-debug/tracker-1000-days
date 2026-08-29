@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Статистика — Трекер челленджа</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body{
+    max-width:640px; margin:0 auto; padding:24px 16px 60px;
+    font-family:-apple-system,Manrope,sans-serif;
+    color:#1A1A1A; line-height:1.5; font-size:15px;
+  }
+  h1{ font-size:22px; }
+  h2{ font-size:16px; margin-top:28px; }
+  .row{
+    display:flex; justify-content:space-between;
+    padding:8px 0; border-bottom:1px solid #eee;
+  }
+  .bar-outer{ background:#F0F0EC; border-radius:4px; height:8px; margin-top:4px; overflow:hidden; }
+  .bar-inner{ background:#1A1A1A; height:100%; }
+  .totals{ display:flex; gap:16px; margin:16px 0; flex-wrap:wrap; }
+  .totals div{ background:#F6F6F2; border:2px solid #1A1A1A; border-radius:8px; padding:10px 14px; }
+  .totals .num{ font-weight:800; font-size:24px; }
+  .totals .label{ font-size:12px; color:#555; }
+</style>
+</head>
+<body>
+<h1>Статистика трекера (только для автора)</h1>
+<div id="content">Загрузка…</div>
+
+<script>
+const SUPABASE_URL = 'https://wvvvkgvxvbmznztqknzrp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WFq8oMP5Z77-4mQCgCFrnQ_JJfHliD7';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function load(){
+  const [{ data: total }, { data: categories }, { data: clicks }] = await Promise.all([
+    sb.rpc('get_total_trackers'),
+    sb.rpc('get_category_stats'),
+    sb.rpc('get_click_stats')
+  ]);
+
+  const authorOpen = (clicks || []).find(c => c.event_type === 'author_open')?.cnt || 0;
+  const instagramClick = (clicks || []).find(c => c.event_type === 'instagram_click')?.cnt || 0;
+
+  const maxCat = Math.max(1, ...(categories || []).map(c => Number(c.cnt)));
+  const catRows = (categories || []).map(c => {
+    const pct = total ? Math.round((c.cnt/total)*100) : 0;
+    const barPct = Math.round((c.cnt/maxCat)*100);
+    return `<div class="row"><span>${c.category}</span><span>${c.cnt} (${pct}%)</span></div>
+            <div class="bar-outer"><div class="bar-inner" style="width:${barPct}%"></div></div>`;
+  }).join('');
+
+  document.getElementById('content').innerHTML = `
+    <div class="totals">
+      <div><div class="num">${total || 0}</div><div class="label">всего трекеров создано</div></div>
+      <div><div class="num">${authorOpen}</div><div class="label">открыли «Автор трекера»</div></div>
+      <div><div class="num">${instagramClick}</div><div class="label">перешли в Instagram</div></div>
+    </div>
+    <h2>По сферам</h2>
+    ${catRows || '<p>Пока нет данных.</p>'}
+  `;
+}
+load();
+</script>
+</body>
+</html>

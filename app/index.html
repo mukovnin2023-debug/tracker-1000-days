@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Трекер челленджа</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Трекер">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="mobile-web-app-capable" content="yes">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg: #FDFDFB;
+    --ink: #1A1A1A;
+    --body: #3A3A3A;
+    --red: #E24C4C;
+    --yellow: #FFE98A;
+    --frame: #F6F6F2;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+  }
+  .eyebrow{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:20px;
+    color:var(--red);
+  }
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:28px;
+    line-height:1.15;
+    margin:4px 0 2px;
+  }
+  .sub{
+    font-size:14px;
+    color:var(--body);
+    margin-bottom:18px;
+  }
+  .card{
+    background:var(--bg);
+    border:2px solid var(--ink);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .card .eyebrow-sm{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:17px;
+    color:var(--red);
+    display:block;
+    margin-bottom:2px;
+  }
+  .card h2{
+    font-size:19px;
+    margin:0 0 12px;
+  }
+  .field{ margin-bottom:14px; }
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:5px;
+  }
+  .field .hint{
+    font-size:12px;
+    color:var(--body);
+    margin-top:4px;
+  }
+  input[type=text], input[type=number], select, textarea{
+    width:100%;
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:10px;
+    resize:vertical;
+    background:#fff;
+  }
+  textarea{ min-height:44px; }
+  textarea:focus, input:focus, select:focus{
+    outline:2px solid var(--red);
+    outline-offset:1px;
+  }
+  .checkbox-row{
+    display:flex;
+    align-items:flex-start;
+    gap:10px;
+    background:var(--frame);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:12px;
+    margin-bottom:12px;
+    cursor:pointer;
+  }
+  .checkbox-row input{
+    width:20px;height:20px;
+    flex:0 0 20px;
+    margin-top:2px;
+    accent-color:var(--ink);
+    cursor:pointer;
+  }
+  .checkbox-row span{
+    font-weight:600;
+    font-size:13.5px;
+    line-height:1.4;
+  }
+  .btn-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:4px;
+  }
+  button{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border-radius:6px;
+    padding:11px 16px;
+    cursor:pointer;
+    border:2px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+  }
+  button.secondary{
+    background:#fff;
+    color:var(--ink);
+  }
+  button:disabled{ opacity:0.5; cursor:not-allowed; }
+  button:active{ transform:translateY(1px); }
+  #startBtn{ width:100%; padding:16px; font-size:16px; }
+
+  .save-flash{
+    font-family:'Caveat',cursive;
+    font-size:16px;
+    color:var(--red);
+    font-weight:700;
+    margin-left:4px;
+    opacity:0;
+    transition:opacity .3s;
+  }
+  .save-flash.show{ opacity:1; }
+
+  .stat-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .stat{
+    flex:1;
+    min-width:100px;
+    background:var(--frame);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:10px 12px;
+  }
+  .stat .num{ font-weight:800; font-size:22px; line-height:1; }
+  .stat .label{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:15px;
+    color:var(--body);
+    margin-top:3px;
+    display:block;
+  }
+
+  .track-title{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:18px;
+    margin:0 0 8px;
+  }
+  .grid-outer{
+    background:var(--frame);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:14px 12px;
+    margin-bottom:22px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(20, 1fr);
+    gap:3px;
+  }
+  .milestone{
+    grid-column:1 / -1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:6px 0 4px;
+  }
+  .milestone .line{
+    flex:1; height:1px;
+    background:repeating-linear-gradient(to right, var(--ink) 0 4px, transparent 4px 8px);
+    opacity:0.5;
+  }
+  .milestone .tag{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:15px;
+    color:var(--body);
+    white-space:nowrap;
+  }
+  .day-cell{
+    aspect-ratio:1;
+    border-radius:2px;
+    background:#EDEDE7;
+    border:1px solid #DAD6CC;
+    cursor:pointer;
+  }
+  .day-cell.future{ background:transparent; border:1px dashed #DAD6CC; cursor:default; }
+  .day-cell.done{ background:var(--ink); border-color:var(--ink); }
+  .day-cell.missed{ background:#F6E4E4; border-color:#EAC2C2; }
+  .day-cell.today{ background:var(--yellow); border:2px solid var(--red); transform:scale(1.15); }
+  .legend{
+    display:flex; gap:14px; flex-wrap:wrap;
+    margin-top:12px; font-size:12px; color:var(--body);
+  }
+  .legend span{ display:inline-flex; align-items:center; gap:5px; }
+  .legend i{ width:10px;height:10px;border-radius:2px;display:inline-block; }
+
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(26,26,26,0.45);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background:var(--bg);
+    width:100%;
+    max-width:640px;
+    border-radius:14px 14px 0 0;
+    padding:18px 16px 24px;
+    border:2px solid var(--ink);
+    border-bottom:none;
+  }
+  .modal-close{
+    display:block;
+    margin:14px auto 0;
+    background:none;
+    border:none;
+    color:var(--body);
+    font-family:'Caveat',cursive;
+    font-size:16px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  .dembel{
+    background:var(--ink);
+    color:#fff;
+    border-radius:8px;
+    padding:18px 16px 16px;
+    margin-bottom:18px;
+  }
+  .dembel-top{ display:flex; align-items:center; justify-content:center; gap:20px; }
+  .dembel-pct{ display:flex; flex-direction:column; align-items:center; }
+  .pct-num{ font-size:32px; font-weight:800; line-height:1; }
+  .pct-num.left{ color:var(--yellow); }
+  .pct-label{ font-family:'Caveat',cursive; font-size:14px; opacity:0.8; margin-top:4px; }
+  .dembel-divider{ width:2px; height:34px; background:rgba(255,255,255,0.25); }
+  .progress-bar{
+    height:9px; background:rgba(255,255,255,0.18);
+    border-radius:5px; margin-top:16px; overflow:hidden;
+  }
+  .progress-fill{ height:100%; background:var(--red); border-radius:5px; }
+  .finish-line{ margin-top:12px; text-align:center; font-size:13px; opacity:0.9; }
+  .finish-line b{ color:var(--yellow); font-family:'Caveat',cursive; font-size:16px; font-weight:700; }
+
+  .start-card p{ font-size:14px; color:var(--body); line-height:1.5; margin:0 0 4px; }
+
+  .consent-row{
+    display:flex; align-items:flex-start; gap:10px;
+    font-size:12.5px; color:var(--body); line-height:1.5;
+    margin:14px 0;
+  }
+  .consent-row input{ width:18px;height:18px; flex:0 0 18px; margin-top:2px; }
+  .consent-row a{ color:var(--ink); }
+
+  .saved-banner{
+    background:var(--yellow);
+    border:2px solid var(--red);
+    border-radius:8px;
+    padding:12px 14px;
+    font-size:13.5px;
+    line-height:1.5;
+    margin-bottom:18px;
+  }
+  .saved-banner b{ display:block; margin-bottom:4px; }
+
+  footer{
+    text-align:center;
+    margin-top:18px;
+  }
+  .author-link{
+    background:none;
+    border:none;
+    color:#9A9A92;
+    font-size:12.5px;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:6px;
+  }
+
+  .error-box{
+    border:2px solid var(--red);
+    background:#FBEAEA;
+    border-radius:8px;
+    padding:14px;
+    font-size:14px;
+    margin-bottom:18px;
+  }
+  #loadingScreen{ text-align:center; padding:60px 0; color:var(--body); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="eyebrow">Трекер челленджа</span>
+  <h1 id="pageTitle">Свой трекер на 1000 дней (и не только)</h1>
+  <div class="sub">Пропуск не обнуляет челлендж — просто продолжаешь дальше.</div>
+
+  <div id="loadingScreen">Загрузка…</div>
+
+  <div id="errorScreen" style="display:none">
+    <div class="error-box" id="errorText"></div>
+  </div>
+
+  <!-- ЭКРАН СОЗДАНИЯ -->
+  <div class="card start-card" id="startScreen" style="display:none">
+    <span class="eyebrow-sm">Настройка</span>
+    <h2>Заведите свой челлендж</h2>
+    <p>Ссылка, которая откроется после нажатия «Начать», — личная. Сразу добавьте её на экран «Домой», иначе доступ к прогрессу будет не восстановить.</p>
+
+    <div class="field">
+      <label for="inTitle">Название челленджа</label>
+      <input type="text" id="inTitle" placeholder="например: 100 дней без сахара">
+    </div>
+    <div class="field">
+      <label for="inGoal">Ради чего челлендж (необязательно)</label>
+      <textarea id="inGoal" placeholder="ваша цель своими словами"></textarea>
+    </div>
+    <div class="field">
+      <label for="inDays">Количество дней</label>
+      <input type="number" id="inDays" min="1" step="1" value="100">
+    </div>
+    <div class="field">
+      <label for="inCategory">Сфера</label>
+      <select id="inCategory">
+        <option>Заработок и бизнес</option>
+        <option>Спорт и здоровье</option>
+        <option>Питание и похудение</option>
+        <option>Обучение и новый навык</option>
+        <option>Творчество и контент</option>
+        <option>Привычки и дисциплина</option>
+        <option>Отношения и семья</option>
+        <option>Ментальное здоровье</option>
+        <option>Другое</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="inCheckLabel">Что считается «сделано» в день</label>
+      <input type="text" id="inCheckLabel" placeholder="например: тренировка сделана">
+    </div>
+
+    <div class="consent-row">
+      <input type="checkbox" id="inConsent">
+      <span>Сфера, срок и дата старта моего челленджа сохраняются обезличенно для общей статистики сервиса. Персональные данные (имя, телефон, e-mail) не собираются. <a href="privacy.html" target="_blank">Подробнее</a>.</span>
+    </div>
+
+    <button id="startBtn" disabled>Начать челлендж</button>
+    <span class="save-flash" id="startFlash"></span>
+  </div>
+
+  <!-- ОСНОВНОЕ ПРИЛОЖЕНИЕ -->
+  <div id="mainApp" style="display:none">
+
+    <div class="saved-banner" id="savedBanner" style="display:none">
+      <b>Сохраните эту ссылку прямо сейчас</b>
+      В Safari нажмите «Поделиться» → «На экран Домой». Это единственный способ вернуться именно к вашему трекеру.
+    </div>
+
+    <div class="dembel">
+      <div class="dembel-top">
+        <div class="dembel-pct">
+          <div class="pct-num" id="pctDone">0%</div>
+          <div class="pct-label">пройдено</div>
+        </div>
+        <div class="dembel-divider"></div>
+        <div class="dembel-pct">
+          <div class="pct-num left" id="pctLeft">100%</div>
+          <div class="pct-label">осталось</div>
+        </div>
+      </div>
+      <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+      <div class="finish-line">прогноз финиша: <b id="finishDate">—</b></div>
+    </div>
+
+    <div class="stat-row" id="statRow"></div>
+
+    <div class="track-title">Календарь дней</div>
+    <div class="grid-outer">
+      <div class="grid" id="grid"></div>
+      <div class="legend">
+        <span><i style="background:var(--ink)"></i> сделано</span>
+        <span><i style="background:#F6E4E4;border:1px solid #EAC2C2"></i> пропуск</span>
+        <span><i style="background:var(--yellow);border:1px solid var(--red)"></i> сегодня</span>
+        <span><i style="background:transparent;border:1px dashed #DAD6CC"></i> впереди</span>
+      </div>
+    </div>
+
+    <div class="card" id="todayCard">
+      <span class="eyebrow-sm" id="todayEyebrow">Сегодня</span>
+      <h2 id="todayHeading">День 1</h2>
+
+      <div class="checkbox-row" id="doneRow">
+        <input type="checkbox" id="doneCheck">
+        <span id="doneLabel">Сделано</span>
+      </div>
+
+      <div class="field">
+        <label for="planInput">План на завтра</label>
+        <textarea id="planInput" placeholder="что планируешь сделать завтра"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="noteInput">Заметка дня</label>
+        <textarea id="noteInput" placeholder="мысль / наблюдение за сегодня"></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button id="saveBtn">Сохранить день</button>
+        <span class="save-flash" id="saveFlash">записано ✓</span>
+      </div>
+    </div>
+
+    <footer>
+      <button class="author-link" id="authorLinkBtn">Автор трекера →</button>
+    </footer>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <span class="eyebrow-sm" id="modalEyebrow">День</span>
+    <h2 id="modalHeading">День N</h2>
+    <div class="checkbox-row" id="modalDoneRow">
+      <input type="checkbox" id="modalDoneCheck">
+      <span id="modalDoneLabel">Сделано</span>
+    </div>
+    <div class="field">
+      <label>План на завтра</label>
+      <textarea id="modalPlanInput"></textarea>
+    </div>
+    <div class="field">
+      <label>Заметка дня</label>
+      <textarea id="modalNoteInput"></textarea>
+    </div>
+    <div class="btn-row">
+      <button id="modalSaveBtn">Сохранить</button>
+    </div>
+    <button class="modal-close" id="modalCloseBtn">закрыть</button>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="authorBackdrop">
+  <div class="modal">
+    <span class="eyebrow-sm">Автор трекера</span>
+    <h2>Вадим</h2>
+    <p style="font-size:14px;color:var(--body);line-height:1.5;margin:0 0 16px;">
+      Делаю Launchstats — сервис аналитики для тех, кто продаёт через блог и соцсети,
+      и веду блог о его создании. Этот трекер — часть моего собственного 1000-дневного челленджа.
+    </p>
+    <div class="btn-row">
+      <a id="instagramLink" href="https://www.instagram.com/az_vadim" target="_blank" rel="noopener">
+        <button>Instagram →</button>
+      </a>
+    </div>
+    <button class="modal-close" id="authorCloseBtn">закрыть</button>
+  </div>
+</div>
+
+<script>
+const SUPABASE_URL = 'https://wvvvkgvxvbmznztqknzrp.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_WFq8oMP5Z77-4mQCgCFrnQ_JJfHliD7';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+const params = new URLSearchParams(window.location.search);
+let trackerId = params.get('id');
+const isNew = params.get('new') === '1';
+
+let tracker = null;
+let entriesByDay = {};
+let selectedDay = null;
+
+function dateStr(d){ return d.toISOString().slice(0,10); }
+function fmtDate(iso){
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+}
+function dayNumberFor(iso){
+  const start = new Date(tracker.start_date+'T00:00:00');
+  const cur = new Date(iso+'T00:00:00');
+  return Math.floor((cur-start)/86400000)+1;
+}
+function isoForDayNumber(n){
+  const start = new Date(tracker.start_date+'T00:00:00');
+  const d = new Date(start.getTime() + (n-1)*86400000);
+  return dateStr(d);
+}
+function todayDayNumber(){
+  return Math.max(1, dayNumberFor(dateStr(new Date())));
+}
+
+function show(id){ document.getElementById(id).style.display = 'block'; }
+function hide(id){ document.getElementById(id).style.display = 'none'; }
+
+function showError(msg){
+  hide('loadingScreen');
+  document.getElementById('errorText').textContent = msg;
+  show('errorScreen');
+}
+
+async function init(){
+  if(!trackerId){
+    hide('loadingScreen');
+    show('startScreen');
+    bindStartScreen();
+    return;
+  }
+  const { data, error } = await sb.rpc('get_tracker', { p_id: trackerId });
+  if(error || !data){
+    showError('Не получилось загрузить трекер — попробуйте обновить страницу.');
+    return;
+  }
+  tracker = Array.isArray(data) ? data[0] : data;
+  if(!tracker){
+    showError('Трекер по этой ссылке не найден. Проверьте, что ссылка скопирована полностью.');
+    return;
+  }
+  const { data: entriesData, error: entriesError } = await sb.rpc('get_entries', { p_tracker_id: trackerId });
+  if(entriesError){
+    showError('Не получилось загрузить записи трекера — попробуйте обновить страницу.');
+    return;
+  }
+  entriesByDay = {};
+  (entriesData || []).forEach(e => { entriesByDay[e.day_number] = e; });
+
+  document.getElementById('pageTitle').textContent = tracker.title;
+  document.getElementById('doneLabel').textContent = tracker.checkbox_label;
+  document.getElementById('modalDoneLabel').textContent = tracker.checkbox_label;
+
+  hide('loadingScreen');
+  show('mainApp');
+  if(isNew){ show('savedBanner'); }
+  bindAppScreen();
+  render();
+}
+
+function bindStartScreen(){
+  const consent = document.getElementById('inConsent');
+  const startBtn = document.getElementById('startBtn');
+  consent.addEventListener('change', () => { startBtn.disabled = !consent.checked; });
+
+  startBtn.addEventListener('click', async () => {
+    const title = document.getElementById('inTitle').value.trim();
+    const goal = document.getElementById('inGoal').value.trim();
+    const days = parseInt(document.getElementById('inDays').value, 10);
+    const category = document.getElementById('inCategory').value;
+    const checkLabel = document.getElementById('inCheckLabel').value.trim();
+    const flash = document.getElementById('startFlash');
+
+    if(!title || !days || days < 1 || !checkLabel){
+      flash.textContent = 'заполните название, дни и «что считается сделано»';
+      flash.style.color = 'var(--red)';
+      flash.classList.add('show');
+      setTimeout(()=>flash.classList.remove('show'), 3000);
+      return;
+    }
+    startBtn.disabled = true;
+    startBtn.textContent = 'Создаю…';
+    const { data, error } = await sb.rpc('create_tracker', {
+      p_title: title, p_goal: goal || null, p_target_days: days,
+      p_checkbox_label: checkLabel, p_category: category
+    });
+    if(error || !data){
+      flash.textContent = 'не получилось создать — попробуйте ещё раз';
+      flash.style.color = 'var(--red)';
+      flash.classList.add('show');
+      startBtn.disabled = false;
+      startBtn.textContent = 'Начать челлендж';
+      return;
+    }
+    const newId = data;
+    const url = new URL(window.location.href);
+    url.searchParams.set('id', newId);
+    url.searchParams.set('new', '1');
+    window.location.href = url.toString();
+  });
+}
+
+function bindAppScreen(){
+  document.getElementById('saveBtn').addEventListener('click', saveToday);
+  document.getElementById('modalSaveBtn').addEventListener('click', saveModalDay);
+  document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+  document.getElementById('modalBackdrop').addEventListener('click', (ev)=>{
+    if(ev.target.id==='modalBackdrop') closeModal();
+  });
+
+  const authorBtn = document.getElementById('authorLinkBtn');
+  const authorBackdrop = document.getElementById('authorBackdrop');
+  authorBtn.addEventListener('click', () => {
+    sb.rpc('log_click', { p_event_type: 'author_open' });
+    authorBackdrop.classList.add('open');
+  });
+  document.getElementById('authorCloseBtn').addEventListener('click', () => {
+    authorBackdrop.classList.remove('open');
+  });
+  authorBackdrop.addEventListener('click', (ev)=>{
+    if(ev.target.id==='authorBackdrop') authorBackdrop.classList.remove('open');
+  });
+  document.getElementById('instagramLink').addEventListener('click', () => {
+    sb.rpc('log_click', { p_event_type: 'instagram_click' });
+  });
+}
+
+function render(){
+  const totalDays = tracker.target_days;
+  const rawToday = todayDayNumber();
+  const today = Math.min(totalDays, rawToday);
+
+  const doneCount = Object.values(entriesByDay).filter(e=>e.done).length;
+  const remaining = Math.max(0, totalDays - doneCount);
+  const pctDone = Math.round((doneCount/totalDays)*100);
+  const pctLeft = 100 - pctDone;
+
+  document.getElementById('pctDone').textContent = pctDone + '%';
+  document.getElementById('pctLeft').textContent = pctLeft + '%';
+  document.getElementById('progressFill').style.width = pctDone + '%';
+
+  const finishEl = document.getElementById('finishDate');
+  if(remaining<=0){
+    finishEl.textContent = 'челлендж пройден 🎉';
+  } else {
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    const finish = new Date(now.getTime() + remaining*86400000);
+    finishEl.textContent = finish.toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+  }
+
+  let streak = 0;
+  for(let n=rawToday; n>=1; n--){
+    const e = entriesByDay[n];
+    if(e && e.done) streak++;
+    else break;
+  }
+  document.getElementById('statRow').innerHTML = `
+    <div class="stat"><div class="num">${rawToday}</div><span class="label">текущий день</span></div>
+    <div class="stat"><div class="num">${doneCount}/${totalDays}</div><span class="label">сделано</span></div>
+    <div class="stat"><div class="num">${streak}</div><span class="label">серия подряд</span></div>
+  `;
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for(let n=1; n<=totalDays; n++){
+    if(n>1 && (n-1)%100===0){
+      const m = document.createElement('div');
+      m.className = 'milestone';
+      m.innerHTML = `<div class="line"></div><span class="tag">${n-1}</span><div class="line"></div>`;
+      grid.appendChild(m);
+    }
+    const cell = document.createElement('div');
+    cell.dataset.day = n;
+    const e = entriesByDay[n];
+    let cls = 'day-cell';
+    if(n===rawToday) cls += ' today';
+    else if(n>rawToday) cls += ' future';
+    else if(e && e.done) cls += ' done';
+    else cls += ' missed';
+    cell.className = cls;
+    cell.title = `День ${n}`;
+    if(n<=rawToday) cell.addEventListener('click', ()=>openDay(n));
+    grid.appendChild(cell);
+  }
+  const finish = document.createElement('div');
+  finish.className = 'milestone';
+  finish.innerHTML = `<div class="line"></div><span class="tag">${totalDays} 🏁</span><div class="line"></div>`;
+  grid.appendChild(finish);
+
+  const t = entriesByDay[rawToday] || {done:false, plan:'', note:''};
+  document.getElementById('todayHeading').textContent = `День ${rawToday} из ${totalDays}`;
+  document.getElementById('todayEyebrow').textContent = fmtDate(isoForDayNumber(rawToday));
+  document.getElementById('doneCheck').checked = !!t.done;
+  document.getElementById('planInput').value = t.plan || '';
+  document.getElementById('noteInput').value = t.note || '';
+}
+
+async function saveToday(){
+  const today = todayDayNumber();
+  const done = document.getElementById('doneCheck').checked;
+  const plan = document.getElementById('planInput').value;
+  const note = document.getElementById('noteInput').value;
+  const flash = document.getElementById('saveFlash');
+
+  const { error } = await sb.rpc('upsert_entry', {
+    p_tracker_id: trackerId, p_day: today, p_done: done, p_plan: plan, p_note: note
+  });
+  if(!error){
+    entriesByDay[today] = { day_number: today, done, plan, note };
+    render();
+    flash.textContent = 'записано ✓';
+    flash.style.color = '';
+  } else {
+    flash.textContent = 'не сохранилось — нажми ещё раз';
+    flash.style.color = 'var(--red)';
+  }
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'), error ? 3500 : 1500);
+}
+
+function openDay(n){
+  selectedDay = n;
+  const e = entriesByDay[n] || {done:false, plan:'', note:''};
+  document.getElementById('modalHeading').textContent = `День ${n} из ${tracker.target_days}`;
+  document.getElementById('modalEyebrow').textContent = fmtDate(isoForDayNumber(n));
+  document.getElementById('modalDoneCheck').checked = !!e.done;
+  document.getElementById('modalPlanInput').value = e.plan || '';
+  document.getElementById('modalNoteInput').value = e.note || '';
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+async function saveModalDay(){
+  if(selectedDay==null) return;
+  const done = document.getElementById('modalDoneCheck').checked;
+  const plan = document.getElementById('modalPlanInput').value;
+  const note = document.getElementById('modalNoteInput').value;
+
+  const { error } = await sb.rpc('upsert_entry', {
+    p_tracker_id: trackerId, p_day: selectedDay, p_done: done, p_plan: plan, p_note: note
+  });
+  if(!error){
+    entriesByDay[selectedDay] = { day_number: selectedDay, done, plan, note };
+    render();
+    closeModal();
+  } else {
+    alert('Не удалось сохранить — проверьте соединение и нажмите «Сохранить» ещё раз.');
+  }
+}
+
+function closeModal(){
+  document.getElementById('modalBackdrop').classList.remove('open');
+  selectedDay = null;
+}
+
+init();
+</script>
+
+</body>
+</html>
