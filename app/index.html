@@ -567,30 +567,61 @@ function computeTotals(){
   return { targetDays, rawToday, doneCount, totalSlots };
 }
 
-function buildMountainPath(totalSlots){
-  const width = 300, height = 84, padTop = 8, padBottom = 12;
-  const pts = [];
-  for(let i=0;i<=totalSlots;i++){
-    const t = i/totalSlots;
-    const trend = (height-padBottom) - t*(height-padBottom-padTop);
-    const wave = Math.sin(i*0.85)*9 + Math.sin(i*0.33+1)*6;
-    let y = trend + wave;
-    y = Math.max(padTop, Math.min(height-padBottom, y));
-    const x = t*(width-8)+4;
-    pts.push([x,y]);
+function seededRandom(n){
+  const x = Math.sin(n*12.9898)*43758.5453;
+  return x - Math.floor(x);
+}
+
+function buildMountainVertices(totalSlots){
+  const width = 300, height = 84, padTop = 10, padBottom = 14;
+  const range = height - padTop - padBottom;
+  const days = [0];
+  let i = 0;
+  while(i < totalSlots){
+    const step = 3 + Math.floor(seededRandom(i*7.31+3) * 5);
+    i = Math.min(totalSlots, i + Math.max(1, step));
+    days.push(i);
   }
-  return { pts, width, height };
+  if(days[days.length-1] !== totalSlots) days.push(totalSlots);
+
+  const vertices = days.map(d => {
+    const t = totalSlots ? d/totalSlots : 0;
+    const trendY = (height-padBottom) - t*range;
+    const amp = (seededRandom(d*3.17+1) - 0.5) * range * 0.55;
+    let y = Math.max(padTop, Math.min(height-padBottom, trendY + amp));
+    const x = t*(width-8) + 4;
+    return { x, y, d };
+  });
+  return { vertices, width, height };
+}
+
+function pointAtDay(vertices, dayIndex){
+  for(let k=0;k<vertices.length-1;k++){
+    const a = vertices[k], b = vertices[k+1];
+    if(dayIndex>=a.d && dayIndex<=b.d){
+      const t = b.d===a.d ? 0 : (dayIndex-a.d)/(b.d-a.d);
+      return { x: a.x+(b.x-a.x)*t, y: a.y+(b.y-a.y)*t };
+    }
+  }
+  const last = vertices[vertices.length-1];
+  return { x:last.x, y:last.y };
 }
 
 function renderMountain(){
   const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
-  const { pts, width, height } = buildMountainPath(totalSlots);
+  const { vertices, width, height } = buildMountainVertices(totalSlots);
 
-  const fullD = 'M' + pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ');
-  const donePts = pts.slice(0, doneCount+1);
-  const doneD = donePts.length>1 ? 'M' + donePts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') : '';
-  const hikerPt = pts[doneCount] || pts[0];
-  const flagPt = pts[pts.length-1];
+  const fullD = 'M' + vertices.map(p=>p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' L ');
+
+  const doneVerts = vertices.filter(v => v.d <= doneCount).map(v=>[v.x.toFixed(1), v.y.toFixed(1)]);
+  const hikerPoint = pointAtDay(vertices, doneCount);
+  const alreadyAtVertex = doneVerts.length && Number(doneVerts[doneVerts.length-1][0]) === Number(hikerPoint.x.toFixed(1));
+  const doneCoords = alreadyAtVertex ? doneVerts : [...doneVerts, [hikerPoint.x.toFixed(1), hikerPoint.y.toFixed(1)]];
+  const doneD = doneCoords.length>1 ? 'M' + doneCoords.map(p=>p[0]+' '+p[1]).join(' L ') : '';
+
+  const hikerPt = [hikerPoint.x, hikerPoint.y];
+  const lastVertex = vertices[vertices.length-1];
+  const flagPt = [lastVertex.x, lastVertex.y];
 
   const svg = `
     <svg viewBox="0 0 ${width} ${height}" width="100%" height="${height}">
