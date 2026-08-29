@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1000 дней</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="1000 дней">
+<meta name="theme-color" content="#1A1A1A">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="apple-touch-icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAgAAAAIACAIAAAB7GkOtAAAaRUlEQVR4nO3df5TVdb3v8e3MgDAyCA54hesPDmIaP0pUBG65uuoxFU3zSPkz7eLPTmr+aOnJUyv7cUv8kdo9t6Mkdsufa2XH1XIJepQSTARayx8JnFqioFBQQCAygAzM3D9gjROlsb/z+c53z/f9ePzRPzGf/fW19t7PvWeGzR5Dhw6tABBPXdEXAEAxBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIISAICgBAAgKAEACEoAAIJqKPoC6Nnq6uoOPPDAYcOGDRt20LBhw4YNGzZoUHNjY2Nj416NjX0bGxsbGho2b97c0tKyadOmTZs2v/POhuXLly9d+uayZcuWLVv2xhtvtLS0FP0fUQzTZWO3hPYYOnRo0ddAD1NfXz9y5MgJEyZMnDhh/Pij+/fvn/mo7du3L1q0aN68+S+88ML8+QveeeedhNdZg0yXjd1yEjoA/frtNWrU6I98ZMzo0aM/8pExw4cPr6tL+T2xY475xLJlyxIeWLgjjhg7efLk00771N5775388La2trlzX3j00UdnzJi5efPm5OcXy3TZ2C1XsQKw9957jxkzevTo0WPGjB4zZsywYcP22GOP/G6uNAEYOHDg+eefN3nymcOHD++Gm2tpaXniiSfuv//Bl19+uRtuLlemy8Zu3aPkAWhubt7xdL/jNf4BBxzQnbdeggA0NTVdeuklF198cb9+e3X/rT/zzKzbbrtt0aLF3X/TXWe6bOzWncoWgH333bfza/xi/+t6dAB69+596aWXXH75ZXm89d597e3tTzwx45Zbbl26dGmBl1EV02Vjt+7X4wMwZMiQMWPG7Hi6HzNm9L777lv0Fb2n5wZgzJgxd911xyGHHFL0hey0ZcuW73735h/96P+1t7cXfS1/h+mysVshenYA9tlnn1deeanoq3hfPTEADQ0NV155xVVXXdnQUHO/Ivz883Ovu+663//+D0VfyN9mumzsViB/EYz3DBo06LHHfnbttdfU4EOxUql87GP/45lnnj7++OOKvpC/wXTZ2K1YAsBOI0Yc/PjjPz/88MOLvpAP0q9fv+nT7z3vvHOLvpC/YLps7FY4AaBSqVTGjRv32GP/sf/++xd9IX9ffX39zTd/9/rrv1z0hexkumzsVgsEgMoxx3z8kUceGjBgQNEXUoUrr7zyO9/5dtFXYbqM7FYjBCC6UaNGTps2rXfv3kVfSNU+97nPXX31lwq8ANNlY7faIQCh7b///vff/5NC/sZNEtddd+3ZZ59VyE2bLhu71RQBiGvAgAEPPnj/4MGDi76QLrn55u8ed9yx3XyjpsvGbrVGAOKaOvXm7vmglVzV19ffdded++23X3feqOmysVutEYCgzj77rEmTTi76KtIYMGDAHXd8L9fP9evMdNnYrQYJQETDhg276aavF30VKX384x+75JKLu+GGTJeN3WqTAIRTV1f3/e/fuddePfWncO/nX/7lhkMPPTTXmzBdNnarWbX416/J1Zlnnjl27NicDt+2bducOc/Nnj174cJFb7755jvvvLN169b+/fvvs88+o0aNGjv28FNOmZTTN0979er1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QNnk9xzt2Z+SEQBKKI9nas/+lI8AUE5pn689+1NKAkBppXrW9uxPWQkAZdb1527P/pSYAFByXXkG9+xPue0xdOjQoq8BukNV/5K7p34iEADC+YASeN4nFAEACMrPAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoAQAICgBAAhKAACCEgCAoP4/+KwFhLIoMtAAAAAASUVORK5CYII=">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FDFDFB;
+    --ink: #1A1A1A;
+    --body: #3A3A3A;
+    --red: #E24C4C;
+    --yellow: #FFE98A;
+    --frame: #F6F6F2;
+  }
+  *{box-sizing:border-box;}
+  html,body{
+    margin:0; padding:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Manrope',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{
+    max-width:640px;
+    margin:0 auto;
+    padding:20px 16px 60px;
+  }
+
+  /* ---- Header ---- */
+  .eyebrow{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:20px;
+    color:var(--red);
+  }
+  h1{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:30px;
+    line-height:1.1;
+    margin:4px 0 2px;
+  }
+  .sub{
+    font-size:14px;
+    color:var(--body);
+    margin-bottom:18px;
+  }
+
+  .goals{
+    border:2px solid var(--ink);
+    border-radius:8px;
+    background:var(--frame);
+    padding:14px 14px 6px;
+    margin-bottom:20px;
+  }
+  .goals .eyebrow-sm{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:17px;
+    color:var(--red);
+    display:block;
+    margin-bottom:8px;
+  }
+  .goal-item{
+    display:flex;
+    gap:12px;
+    align-items:flex-start;
+    padding-bottom:12px;
+    margin-bottom:12px;
+    border-bottom:2px dashed var(--ink);
+  }
+  .goal-item:last-child{
+    border-bottom:none;
+    margin-bottom:0;
+    padding-bottom:12px;
+  }
+  .goal-num{
+    font-family:'Manrope',sans-serif;
+    font-weight:800;
+    font-size:16.5px;
+    color:var(--ink);
+    line-height:1.3;
+    flex:0 0 108px;
+    width:108px;
+    overflow-wrap:break-word;
+  }
+  .goal-text{
+    flex:1 1 auto;
+    min-width:0;
+    font-size:13.5px;
+    color:var(--body);
+    line-height:1.45;
+    padding-top:2px;
+  }
+  .goal-text b{
+    color:var(--ink);
+  }
+
+  .stat-row{
+    display:flex;
+    gap:10px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  .stat{
+    flex:1;
+    min-width:100px;
+    background:var(--frame);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:10px 12px;
+  }
+  .stat .num{
+    font-weight:800;
+    font-size:22px;
+    line-height:1;
+  }
+  .stat .label{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:15px;
+    color:var(--body);
+    margin-top:3px;
+    display:block;
+  }
+
+  /* ---- Track / grid ---- */
+  .track-title{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:18px;
+    margin:0 0 8px;
+  }
+  .grid-outer{
+    background:var(--frame);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:14px 12px;
+    margin-bottom:22px;
+  }
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(20, 1fr);
+    gap:3px;
+  }
+  .milestone{
+    grid-column:1 / -1;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:6px 0 4px;
+  }
+  .milestone .line{
+    flex:1;
+    height:1px;
+    background:repeating-linear-gradient(to right, var(--ink) 0 4px, transparent 4px 8px);
+    opacity:0.5;
+  }
+  .milestone .tag{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:15px;
+    color:var(--body);
+    white-space:nowrap;
+  }
+  .day-cell{
+    aspect-ratio:1;
+    border-radius:2px;
+    background:#EDEDE7;
+    border:1px solid #DAD6CC;
+    cursor:pointer;
+  }
+  .day-cell.future{
+    background:transparent;
+    border:1px dashed #DAD6CC;
+    cursor:default;
+  }
+  .day-cell.done{
+    background:var(--ink);
+    border-color:var(--ink);
+  }
+  .day-cell.missed{
+    background:#F6E4E4;
+    border-color:#EAC2C2;
+  }
+  .day-cell.today{
+    background:var(--yellow);
+    border:2px solid var(--red);
+    transform:scale(1.15);
+  }
+  .legend{
+    display:flex;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:12px;
+    font-size:12px;
+    color:var(--body);
+  }
+  .legend span{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+  }
+  .legend i{
+    width:10px;height:10px;border-radius:2px;display:inline-block;
+  }
+
+  /* ---- Today card ---- */
+  .card{
+    background:var(--bg);
+    border:2px solid var(--ink);
+    border-radius:8px;
+    padding:16px;
+    margin-bottom:18px;
+    position:relative;
+  }
+  .card .eyebrow-sm{
+    font-family:'Caveat',cursive;
+    font-weight:700;
+    font-size:17px;
+    color:var(--red);
+    display:block;
+    margin-bottom:2px;
+  }
+  .card h2{
+    font-size:19px;
+    margin:0 0 12px;
+  }
+  .field{
+    margin-bottom:12px;
+  }
+  .field label{
+    display:block;
+    font-size:13px;
+    font-weight:600;
+    margin-bottom:5px;
+  }
+  .checkbox-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    background:var(--frame);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:12px;
+    margin-bottom:12px;
+    cursor:pointer;
+  }
+  .checkbox-row input{
+    width:20px;height:20px;
+    accent-color:var(--ink);
+    cursor:pointer;
+  }
+  .checkbox-row span{
+    font-weight:700;
+    font-size:15px;
+  }
+  textarea{
+    width:100%;
+    font-family:'Manrope',sans-serif;
+    font-size:14px;
+    color:var(--ink);
+    border:2px solid var(--ink);
+    border-radius:6px;
+    padding:10px;
+    resize:vertical;
+    min-height:44px;
+    background:#fff;
+  }
+  textarea:focus, input:focus{
+    outline:2px solid var(--red);
+    outline-offset:1px;
+  }
+  .btn-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-top:4px;
+  }
+  button{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:14px;
+    border-radius:6px;
+    padding:11px 16px;
+    cursor:pointer;
+    border:2px solid var(--ink);
+    background:var(--ink);
+    color:#fff;
+  }
+  button.secondary{
+    background:#fff;
+    color:var(--ink);
+  }
+  button:active{ transform:translateY(1px); }
+  .save-flash{
+    font-family:'Caveat',cursive;
+    font-size:16px;
+    color:var(--red);
+    font-weight:700;
+    margin-left:4px;
+    opacity:0;
+    transition:opacity .3s;
+  }
+  .save-flash.show{ opacity:1; }
+
+  /* ---- Modal for past days ---- */
+  .modal-backdrop{
+    position:fixed; inset:0;
+    background:rgba(26,26,26,0.45);
+    display:none;
+    align-items:flex-end;
+    justify-content:center;
+    z-index:50;
+  }
+  .modal-backdrop.open{ display:flex; }
+  .modal{
+    background:var(--bg);
+    width:100%;
+    max-width:640px;
+    border-radius:14px 14px 0 0;
+    padding:18px 16px 24px;
+    border:2px solid var(--ink);
+    border-bottom:none;
+  }
+  .modal-close{
+    display:block;
+    margin:14px auto 0;
+    background:none;
+    border:none;
+    color:var(--body);
+    font-family:'Caveat',cursive;
+    font-size:16px;
+    text-decoration:underline;
+    cursor:pointer;
+  }
+
+  footer{
+    text-align:center;
+    font-family:'Caveat',cursive;
+    font-size:15px;
+    color:var(--body);
+    margin-top:10px;
+  }
+
+  .backup-card{
+    border:2px dashed var(--ink);
+    border-radius:8px;
+    padding:14px;
+    margin-bottom:18px;
+  }
+  .backup-note{
+    font-size:12.5px;
+    color:var(--body);
+    line-height:1.45;
+    margin:4px 0 12px;
+  }
+
+  /* ---- Start screen ---- */
+  .start-card{
+    border:2px solid var(--ink);
+    border-radius:8px;
+    background:var(--bg);
+    padding:22px 18px;
+    text-align:center;
+  }
+  .start-card p{
+    font-size:14px;
+    color:var(--body);
+    line-height:1.5;
+    margin:0 0 18px;
+  }
+  #startBtn{
+    width:100%;
+    padding:16px;
+    font-size:16px;
+  }
+
+  /* ---- Dembel-style progress ---- */
+  .dembel{
+    background:var(--ink);
+    color:#fff;
+    border-radius:8px;
+    padding:18px 16px 16px;
+    margin-bottom:18px;
+  }
+  .dembel-top{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+  }
+  .dembel-pct{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+  .pct-num{
+    font-size:32px;
+    font-weight:800;
+    line-height:1;
+  }
+  .pct-num.left{ color:var(--yellow); }
+  .pct-label{
+    font-family:'Caveat',cursive;
+    font-size:14px;
+    opacity:0.8;
+    margin-top:4px;
+  }
+  .dembel-divider{
+    width:2px;
+    height:34px;
+    background:rgba(255,255,255,0.25);
+  }
+  .progress-bar{
+    height:9px;
+    background:rgba(255,255,255,0.18);
+    border-radius:5px;
+    margin-top:16px;
+    overflow:hidden;
+  }
+  .progress-fill{
+    height:100%;
+    background:var(--red);
+    border-radius:5px;
+  }
+  .finish-line{
+    margin-top:12px;
+    text-align:center;
+    font-size:13px;
+    opacity:0.9;
+  }
+  .finish-line b{
+    color:var(--yellow);
+    font-family:'Caveat',cursive;
+    font-size:16px;
+    font-weight:700;
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <span class="eyebrow">Челлендж · Launchstats + блог</span>
+  <h1>1000 дней</h1>
+  <div class="sub">Пропуск не обнуляет челлендж — просто продолжаешь дальше.</div>
+
+  <div class="goals">
+    <span class="eyebrow-sm">Ради чего челлендж</span>
+    <div class="goal-item">
+      <div class="goal-num">200 млн ₽</div>
+      <div class="goal-text">продать <b>Launchstats.ru</b> минимум за эту сумму — на пике роста, ориентир 10&nbsp;000 постоянных клиентов</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">5 млн ₽/мес</div>
+      <div class="goal-text">выйти на этот <b>чистый доход ежемесячно</b> — неважно откуда: блог, Launchstats, оба сразу</div>
+    </div>
+    <div class="goal-item">
+      <div class="goal-num">Ежедневно</div>
+      <div class="goal-text">вести блог не ради подписчиков самих по себе, а ради <b>вовлечения и монетизации</b> — блог существует, чтобы зарабатывать</div>
+    </div>
+  </div>
+
+  <div class="start-card" id="startScreen">
+    <p>Челлендж стартует в день нажатия кнопки. Сегодняшняя дата станет днём 1 из 1000.</p>
+    <button id="startBtn">Начать челлендж</button>
+  </div>
+
+  <div id="mainApp" style="display:none">
+
+  <div class="dembel">
+    <div class="dembel-top">
+      <div class="dembel-pct">
+        <div class="pct-num" id="pctDone">0%</div>
+        <div class="pct-label">пройдено</div>
+      </div>
+      <div class="dembel-divider"></div>
+      <div class="dembel-pct">
+        <div class="pct-num left" id="pctLeft">100%</div>
+        <div class="pct-label">осталось</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+    <div class="finish-line">прогноз финиша: <b id="finishDate">—</b></div>
+  </div>
+
+  <div class="stat-row" id="statRow"></div>
+
+  <div class="track-title">Календарь дней</div>
+  <div class="grid-outer">
+    <div class="grid" id="grid"></div>
+    <div class="legend">
+      <span><i style="background:var(--ink)"></i> сделано</span>
+      <span><i style="background:#F6E4E4;border:1px solid #EAC2C2"></i> пропуск</span>
+      <span><i style="background:var(--yellow);border:1px solid var(--red)"></i> сегодня</span>
+      <span><i style="background:transparent;border:1px dashed #DAD6CC"></i> впереди</span>
+    </div>
+  </div>
+
+  <div class="card" id="todayCard">
+    <span class="eyebrow-sm" id="todayEyebrow">Сегодня</span>
+    <h2 id="todayHeading">День 1 из 1000</h2>
+
+    <div class="checkbox-row" id="reelsRow">
+      <input type="checkbox" id="reelsCheck">
+      <span>Рилс снят и опубликован</span>
+    </div>
+
+    <div class="field">
+      <label for="launchInput">Шаг по Launchstats</label>
+      <textarea id="launchInput" placeholder="что сегодня сделал для сервиса"></textarea>
+    </div>
+
+    <div class="field">
+      <label for="noteInput">Мысль дня / заметка</label>
+      <textarea id="noteInput" placeholder="то, что пришло в голову"></textarea>
+    </div>
+
+    <div class="btn-row">
+      <button id="saveBtn">Сохранить день</button>
+      <button class="secondary" id="copyBtn">Скопировать отчёт</button>
+      <span class="save-flash" id="saveFlash">записано ✓</span>
+    </div>
+  </div>
+
+  <div class="backup-card">
+    <span class="eyebrow-sm">Резервная копия</span>
+    <p class="backup-note">Данные хранятся в этом Safari/приложении. Скачивай копию раз в неделю — на случай, если что-то пойдёт не так с телефоном.</p>
+    <div class="btn-row">
+      <button class="secondary" id="exportBtn">Скачать копию</button>
+      <button class="secondary" id="importBtn">Восстановить из файла</button>
+    </div>
+    <input type="file" id="importFile" accept="application/json" style="display:none">
+    <span class="save-flash" id="backupFlash">готово ✓</span>
+  </div>
+
+  <footer>день за днём, без выдумывания →</footer>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal">
+    <span class="eyebrow-sm" id="modalEyebrow">День</span>
+    <h2 id="modalHeading">День N</h2>
+
+    <div class="checkbox-row" id="modalReelsRow">
+      <input type="checkbox" id="modalReelsCheck">
+      <span>Рилс снят и опубликован</span>
+    </div>
+    <div class="field">
+      <label>Шаг по Launchstats</label>
+      <textarea id="modalLaunchInput"></textarea>
+    </div>
+    <div class="field">
+      <label>Мысль дня / заметка</label>
+      <textarea id="modalNoteInput"></textarea>
+    </div>
+    <div class="btn-row">
+      <button id="modalSaveBtn">Сохранить</button>
+    </div>
+    <button class="modal-close" id="modalCloseBtn">закрыть</button>
+  </div>
+</div>
+
+<script>
+const TOTAL_DAYS = 1000;
+let meta = null;
+let entries = {};
+let selectedDay = null;
+
+function dateStr(d){
+  return d.toISOString().slice(0,10);
+}
+function fmtDate(iso){
+  const d = new Date(iso+'T00:00:00');
+  return d.toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+}
+function dayNumberFor(iso){
+  const start = new Date(meta.startDate+'T00:00:00');
+  const cur = new Date(iso+'T00:00:00');
+  return Math.floor((cur-start)/86400000)+1;
+}
+function isoForDayNumber(n){
+  const start = new Date(meta.startDate+'T00:00:00');
+  const d = new Date(start.getTime() + (n-1)*86400000);
+  return dateStr(d);
+}
+
+async function loadData(){
+  try{
+    const m = localStorage.getItem('tracker1000_meta');
+    meta = m ? JSON.parse(m) : null;
+  }catch(e){
+    meta = null;
+  }
+  try{
+    const e = localStorage.getItem('tracker1000_entries');
+    entries = e ? JSON.parse(e) : {};
+  }catch(e){
+    entries = {};
+  }
+}
+
+async function startChallenge(){
+  meta = { startDate: dateStr(new Date()), started: true };
+  try{ localStorage.setItem('tracker1000_meta', JSON.stringify(meta)); }catch(e){}
+  document.getElementById('startScreen').style.display = 'none';
+  document.getElementById('mainApp').style.display = 'block';
+  render();
+}
+
+async function saveEntries(){
+  try{
+    localStorage.setItem('tracker1000_entries', JSON.stringify(entries));
+    return true;
+  }catch(e){
+    console.error('local storage save failed', e);
+    return false;
+  }
+}
+
+function todayDayNumber(){
+  const n = dayNumberFor(dateStr(new Date()));
+  return Math.max(1, n);
+}
+
+function render(){
+  const rawToday = todayDayNumber();
+  const today = Math.min(TOTAL_DAYS, rawToday);
+
+  // completion-based stats
+  const doneCount = Object.values(entries).filter(e=>e.reels).length;
+  const remaining = Math.max(0, TOTAL_DAYS - doneCount);
+  const pctDone = Math.round((doneCount/TOTAL_DAYS)*100);
+  const pctLeft = 100 - pctDone;
+
+  document.getElementById('pctDone').textContent = pctDone + '%';
+  document.getElementById('pctLeft').textContent = pctLeft + '%';
+  document.getElementById('progressFill').style.width = pctDone + '%';
+
+  const finishEl = document.getElementById('finishDate');
+  if(remaining<=0){
+    finishEl.textContent = 'челлендж пройден 🎉';
+  } else {
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    const finish = new Date(now.getTime() + remaining*86400000);
+    finishEl.textContent = finish.toLocaleDateString('ru-RU', {day:'numeric', month:'long', year:'numeric'});
+  }
+
+  // small stat row
+  let streak = 0;
+  for(let n=rawToday; n>=1; n--){
+    const e = entries[n];
+    if(e && e.reels) streak++;
+    else break;
+  }
+  const statRow = document.getElementById('statRow');
+  statRow.innerHTML = `
+    <div class="stat"><div class="num">${rawToday}</div><span class="label">текущий день</span></div>
+    <div class="stat"><div class="num">${doneCount}/1000</div><span class="label">рилсов сделано</span></div>
+    <div class="stat"><div class="num">${streak}</div><span class="label">серия подряд</span></div>
+  `;
+
+  // grid
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  for(let n=1; n<=TOTAL_DAYS; n++){
+    if(n>1 && (n-1)%100===0){
+      const m = document.createElement('div');
+      m.className = 'milestone';
+      m.innerHTML = `<div class="line"></div><span class="tag">${n-1}</span><div class="line"></div>`;
+      grid.appendChild(m);
+    }
+    const cell = document.createElement('div');
+    cell.dataset.day = n;
+    const e = entries[n];
+    let cls = 'day-cell';
+    if(n===rawToday) cls += ' today';
+    else if(n>rawToday) cls += ' future';
+    else if(e && e.reels) cls += ' done';
+    else cls += ' missed';
+    cell.className = cls;
+    cell.title = `День ${n}`;
+    if(n<=rawToday) cell.addEventListener('click', ()=>openDay(n));
+    grid.appendChild(cell);
+  }
+  const finish = document.createElement('div');
+  finish.className = 'milestone';
+  finish.innerHTML = `<div class="line"></div><span class="tag">1000 🏁</span><div class="line"></div>`;
+  grid.appendChild(finish);
+
+  // today card
+  const t = entries[rawToday] || {reels:false, launch:'', note:''};
+  document.getElementById('todayHeading').textContent = `День ${rawToday} из 1000`;
+  document.getElementById('todayEyebrow').textContent = fmtDate(isoForDayNumber(rawToday));
+  document.getElementById('reelsCheck').checked = !!t.reels;
+  document.getElementById('launchInput').value = t.launch || '';
+  document.getElementById('noteInput').value = t.note || '';
+}
+
+async function saveToday(){
+  const today = todayDayNumber();
+  entries[today] = {
+    reels: document.getElementById('reelsCheck').checked,
+    launch: document.getElementById('launchInput').value,
+    note: document.getElementById('noteInput').value
+  };
+  const ok = await saveEntries();
+  render();
+  const flash = document.getElementById('saveFlash');
+  if(ok){
+    flash.textContent = 'записано ✓';
+    flash.style.color = '';
+  } else {
+    flash.textContent = 'не сохранилось — нажми ещё раз';
+    flash.style.color = 'var(--red)';
+  }
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'), ok ? 1500 : 3500);
+  return ok;
+}
+
+function buildReportText(n){
+  const e = entries[n] || {reels:false, launch:'', note:''};
+  const iso = isoForDayNumber(n);
+  const lines = [
+    `День ${n}/1000 — ${fmtDate(iso)}`,
+    `${e.reels ? '✅' : '❌'} Рилс: ${e.reels ? 'опубликован' : 'нет'}`,
+    `🚀 Launchstats: ${e.launch || '—'}`,
+    `💭 Мысль дня: ${e.note || '—'}`
+  ];
+  return lines.join('\n');
+}
+
+async function copyTodayReport(){
+  // save first so the report reflects current fields
+  const ok = await saveToday();
+  const today = todayDayNumber();
+  const text = buildReportText(today);
+  try{
+    await navigator.clipboard.writeText(text);
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = ok ? 'Скопировано ✓' : 'Скопировано (не сохранено!)';
+    setTimeout(()=>{ btn.textContent = original; }, 2000);
+  }catch(e){
+    alert(text);
+  }
+}
+
+function openDay(n){
+  selectedDay = n;
+  const e = entries[n] || {reels:false, launch:'', note:''};
+  document.getElementById('modalHeading').textContent = `День ${n} из 1000`;
+  document.getElementById('modalEyebrow').textContent = fmtDate(isoForDayNumber(n));
+  document.getElementById('modalReelsCheck').checked = !!e.reels;
+  document.getElementById('modalLaunchInput').value = e.launch || '';
+  document.getElementById('modalNoteInput').value = e.note || '';
+  document.getElementById('modalBackdrop').classList.add('open');
+}
+
+async function saveModalDay(){
+  if(selectedDay==null) return;
+  entries[selectedDay] = {
+    reels: document.getElementById('modalReelsCheck').checked,
+    launch: document.getElementById('modalLaunchInput').value,
+    note: document.getElementById('modalNoteInput').value
+  };
+  const ok = await saveEntries();
+  render();
+  if(ok){
+    closeModal();
+  } else {
+    alert('Не удалось сохранить — проверь соединение и нажми «Сохранить» ещё раз. Введённый текст не потерян, он остался в поле.');
+  }
+}
+
+function closeModal(){
+  document.getElementById('modalBackdrop').classList.remove('open');
+  selectedDay = null;
+}
+
+document.getElementById('saveBtn').addEventListener('click', saveToday);
+document.getElementById('copyBtn').addEventListener('click', copyTodayReport);
+document.getElementById('modalSaveBtn').addEventListener('click', saveModalDay);
+document.getElementById('modalCloseBtn').addEventListener('click', closeModal);
+document.getElementById('modalBackdrop').addEventListener('click', (ev)=>{
+  if(ev.target.id==='modalBackdrop') closeModal();
+});
+document.getElementById('startBtn').addEventListener('click', startChallenge);
+
+function exportBackup(){
+  const payload = { meta, entries, exportedAt: new Date().toISOString() };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const dateTag = dateStr(new Date());
+  a.href = url;
+  a.download = `1000-dney-backup-${dateTag}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  const flash = document.getElementById('backupFlash');
+  flash.textContent = 'скачано ✓';
+  flash.classList.add('show');
+  setTimeout(()=>flash.classList.remove('show'), 2000);
+}
+
+function importBackup(file){
+  const reader = new FileReader();
+  reader.onload = async () => {
+    try{
+      const data = JSON.parse(reader.result);
+      if(!data.entries) throw new Error('bad file');
+      entries = data.entries || {};
+      if(data.meta) meta = data.meta;
+      try{ localStorage.setItem('tracker1000_entries', JSON.stringify(entries)); }catch(e){}
+      if(meta) try{ localStorage.setItem('tracker1000_meta', JSON.stringify(meta)); }catch(e){}
+      if(meta && meta.started){
+        document.getElementById('startScreen').style.display = 'none';
+        document.getElementById('mainApp').style.display = 'block';
+      }
+      render();
+      const flash = document.getElementById('backupFlash');
+      flash.textContent = 'восстановлено ✓';
+      flash.classList.add('show');
+      setTimeout(()=>flash.classList.remove('show'), 2000);
+    }catch(e){
+      alert('Не получилось прочитать файл — убедись, что это тот же файл, который скачивал трекер.');
+    }
+  };
+  reader.readAsText(file);
+}
+
+document.getElementById('exportBtn').addEventListener('click', exportBackup);
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change', (ev)=>{
+  if(ev.target.files && ev.target.files[0]) importBackup(ev.target.files[0]);
+});
+
+(async function init(){
+  await loadData();
+  if(meta && meta.started){
+    document.getElementById('startScreen').style.display = 'none';
+    document.getElementById('mainApp').style.display = 'block';
+    render();
+  }
+})();
+</script>
+
+</body>
+</html>
