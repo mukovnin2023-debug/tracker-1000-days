@@ -12,6 +12,8 @@ const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 const API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 const SITE_URL = 'https://mukovnin2023-debug.github.io/tracker-1000-days/app/';
 
+const PROGRESS_BUTTON_TEXT = '📊 Мой прогресс';
+
 async function tg(method, payload) {
   const res = await fetch(`${API}/${method}`, {
     method: 'POST',
@@ -21,8 +23,25 @@ async function tg(method, payload) {
   return res.json();
 }
 
-function sendMessage(chatId, text) {
-  return tg('sendMessage', { chat_id: chatId, text, disable_web_page_preview: true });
+function sendMessage(chatId, text, opts = {}) {
+  const payload = { chat_id: chatId, text, disable_web_page_preview: true };
+  if (opts.trackerId) {
+    payload.reply_markup = {
+      inline_keyboard: [[{ text: opts.buttonText || 'Открыть трекер →', url: `${SITE_URL}?id=${opts.trackerId}` }]]
+    };
+  } else if (opts.persistentKeyboard) {
+    payload.reply_markup = {
+      keyboard: [[PROGRESS_BUTTON_TEXT]],
+      resize_keyboard: true
+    };
+  }
+  return tg('sendMessage', payload);
+}
+
+function setBotCommands() {
+  return tg('setMyCommands', {
+    commands: [{ command: 'status', description: 'Показать текущий прогресс' }]
+  });
 }
 
 // Локальная дата (YYYY-MM-DD) в часовом поясе пользователя — тот же принцип,
@@ -49,6 +68,11 @@ function dayNumberFor(startDate, isoDate) {
   return Math.floor((cur - start) / 86400000) + 1;
 }
 
+function fmtRuDate(isoDate) {
+  const d = new Date(isoDate + 'T00:00:00Z');
+  return d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: 'UTC' });
+}
+
 async function computeProgress(db, tracker) {
   const tz = tracker.timezone || 'Europe/Moscow';
   const todayIso = localDateInTz(tz);
@@ -64,7 +88,20 @@ async function computeProgress(db, tracker) {
   const missedSoFar = Math.max(0, (rawToday - 1) - doneCount);
   const totalSlots = Math.max(tracker.target_days + missedSoFar, rawToday);
   const remaining = Math.max(0, tracker.target_days - doneCount);
-  return { rawToday, doneCount, totalSlots, remaining, entryByDay, todayIso };
+
+  let finishDate;
+  if (remaining <= 0) {
+    finishDate = 'челлендж пройден 🎉';
+  } else {
+    const todayUtc = new Date(todayIso + 'T00:00:00Z');
+    const finish = new Date(todayUtc.getTime() + remaining * 86400000);
+    finishDate = fmtRuDate(finish.toISOString().slice(0, 10));
+  }
+
+  return { rawToday, doneCount, totalSlots, remaining, entryByDay, todayIso, finishDate };
 }
 
-module.exports = { initDb, tg, sendMessage, dayNumberFor, localDateInTz, localHourInTz, computeProgress, SITE_URL };
+module.exports = {
+  initDb, tg, sendMessage, setBotCommands, dayNumberFor, localDateInTz, localHourInTz,
+  computeProgress, SITE_URL, PROGRESS_BUTTON_TEXT
+};

@@ -1,7 +1,17 @@
-const { initDb, tg, sendMessage, computeProgress, SITE_URL } = require('./common');
+const { initDb, tg, sendMessage, setBotCommands, computeProgress, PROGRESS_BUTTON_TEXT } = require('./common');
+
+function statusText(tracker, p) {
+  return `«${tracker.title}»\n\n` +
+    `День ${p.rawToday} из ${p.totalSlots}\n` +
+    `Сделано: ${p.doneCount}/${tracker.target_days}\n` +
+    `Осталось: ${p.remaining} дней\n` +
+    `Финиш (прогноз): ${p.finishDate}`;
+}
 
 async function main() {
   const db = initDb();
+  await setBotCommands();
+
   const stateRef = db.collection('bot_state').doc('telegram');
   const stateSnap = await stateRef.get();
   const lastUpdateId = stateSnap.exists ? (stateSnap.data().lastUpdateId || 0) : 0;
@@ -21,40 +31,38 @@ async function main() {
       const parts = text.split(' ');
       const trackerId = parts[1];
       if (!trackerId) {
-        await sendMessage(chatId, 'Чтобы подключить напоминания, откройте свой трекер и нажмите кнопку «Подключить Telegram» — она сама пришлёт сюда правильную ссылку.');
+        await sendMessage(chatId, 'Чтобы подключить напоминания, открой свой трекер и нажми там кнопку «Подключить Telegram» — она сама пришлёт сюда правильную ссылку.');
         continue;
       }
       const trackerSnap = await db.collection('trackers').doc(trackerId).get();
       if (!trackerSnap.exists) {
-        await sendMessage(chatId, 'Не нашёл такой трекер — проверьте, что перешли по ссылке из своего приложения.');
+        await sendMessage(chatId, 'Не нашёл такой трекер — проверь, что перешёл по ссылке из своего приложения.');
         continue;
       }
       await db.collection('trackers').doc(trackerId).update({ telegram_chat_id: chatId });
-      const t = trackerSnap.data();
-      await sendMessage(chatId, `Готово! Буду напоминать про «${t.title}» раз в день в 18:00 по Москве, если день ещё не заполнен. Команда /status покажет текущий прогресс в любой момент.`);
+      await sendMessage(
+        chatId,
+        '✅ Готово! Раз в день, в 17:00 по твоему времени, буду присылать напоминание — чтобы дни челленджа реже пропускались.',
+        { persistentKeyboard: true }
+      );
       continue;
     }
 
-    if (text === '/status') {
+    if (text === '/status' || text === PROGRESS_BUTTON_TEXT) {
       const q = await db.collection('trackers').where('telegram_chat_id', '==', chatId).get();
       if (q.empty) {
-        await sendMessage(chatId, 'Трекер ещё не подключён — откройте свою ссылку трекера и нажмите «Подключить Telegram».');
+        await sendMessage(chatId, 'Трекер ещё не подключён — открой свою ссылку трекера и нажми «Подключить Telegram».');
         continue;
       }
       for (const doc of q.docs) {
         const tracker = { id: doc.id, ...doc.data() };
         const p = await computeProgress(db, tracker);
-        const finishNote = p.remaining <= 0
-          ? 'челлендж пройден 🎉'
-          : `осталось ${p.remaining} дней`;
-        await sendMessage(chatId,
-          `«${tracker.title}»\nдень ${p.rawToday} из ${p.totalSlots}\nсделано: ${p.doneCount}/${tracker.target_days}\n${finishNote}\n\n${SITE_URL}?id=${tracker.id}`
-        );
+        await sendMessage(chatId, statusText(tracker, p), { trackerId: tracker.id });
       }
       continue;
     }
 
-    await sendMessage(chatId, 'Команды: /status — показать прогресс. Чтобы подключить трекер — перейдите по ссылке «Подключить Telegram» из самого приложения.');
+    await sendMessage(chatId, '👋 Привет! Я бот-напоминалка для трекера челленджа. Чтобы меня подключить — открой свой трекер и нажми там кнопку «Подключить Telegram».');
   }
 
   if (maxId !== lastUpdateId) {
