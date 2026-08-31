@@ -12,12 +12,13 @@ async function main() {
     if (p.remaining <= 0) continue; // челлендж пройден — напоминания больше не нужны
 
     const todayEntry = p.entryByDay[p.rawToday];
-    if (todayEntry && todayEntry.done) continue; // уже отмечено сегодня
+    const doneToday = !!(todayEntry && todayEntry.done);
 
-    await sendMessage(
-      tracker.telegram_chat_id,
-      `Напоминание: день ${p.rawToday} из ${p.totalSlots} по «${tracker.title}» ещё не заполнен.\n«${tracker.checkbox_label}» — сделано сегодня?\n\n${SITE_URL}?id=${tracker.id}`
-    );
+    const text = doneToday
+      ? `День ${p.rawToday} по «${tracker.title}» отмечен ✅ Так держать — движение к цели идёт по плану!\n\n${SITE_URL}?id=${tracker.id}`
+      : `Напоминание: день ${p.rawToday} из ${p.totalSlots} по «${tracker.title}» ещё не заполнен.\n«${tracker.checkbox_label}» — сделано сегодня?\n\n${SITE_URL}?id=${tracker.id}`;
+
+    await sendMessage(tracker.telegram_chat_id, text);
   }
 }
 
