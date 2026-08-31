@@ -328,6 +328,11 @@ footer{ text-align:center; margin-top:18px; }
         <span style="color:var(--accent);font-weight:600;">✅ Telegram подключён<span id="telegramUsername"></span></span>
         <button class="secondary" id="telegramDisconnectBtn" style="font-size:12px;padding:4px 10px;">Отключить уведомления</button>
       </div>
+      <label id="telegramConsentLabel" style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--sub);line-height:1.4;margin-bottom:10px;cursor:pointer;">
+        <input type="checkbox" id="telegramConsentCheckbox" style="margin-top:2px;">
+        <span>Согласен(на) на обработку данных из Telegram (ID чата, имя и/или ник — нужны только чтобы бот мог написать вам) согласно <a href="privacy.html" target="_blank" rel="noopener">политике обработки данных</a></span>
+      </label>
+      <span class="save-flash" id="telegramConsentFlash"></span>
       <a id="telegramConnectLink" href="#" target="_blank" rel="noopener">
         <button class="secondary" id="telegramConnectBtn">Подключить Telegram →</button>
       </a>
@@ -916,6 +921,19 @@ function updateTelegramCard(){
 function closeSettings(){ hide('settingsScreen'); show('mainApp'); }
 
 function bindSettingsScreen(){
+  document.getElementById('telegramConnectLink').addEventListener('click', async (e) => {
+    const consentFlash = document.getElementById('telegramConsentFlash');
+    if(!document.getElementById('telegramConsentCheckbox').checked){
+      e.preventDefault();
+      consentFlash.textContent = 'сначала отметьте согласие выше';
+      consentFlash.style.color = 'var(--accent)';
+      consentFlash.classList.add('show');
+      setTimeout(()=>consentFlash.classList.remove('show'), 3000);
+      return;
+    }
+    try{ await updateDoc(doc(db, 'trackers', trackerId), { telegram_consent_at: serverTimestamp() }); }catch(err){}
+  });
+
   document.getElementById('stSaveBtn').addEventListener('click', async () => {
     const flash = document.getElementById('stFlash');
     const title = document.getElementById('stTitle').value.trim();
