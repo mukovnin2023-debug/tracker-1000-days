@@ -153,23 +153,6 @@ footer{ text-align:center; margin-top:18px; }
   <path d="M8 13 L5 16 L3.5 19" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
   <path d="M8 13 L11 16 L12.5 20" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
 </symbol>
-<symbol id="victoryFigure" viewBox="0 0 40 55" style="overflow:visible">
-  <circle cx="16" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3"/>
-  <path d="M16 12.6 L16 23" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M16 15 L9 17.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M16 23 L10 30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M16 23 L22 30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-  <path d="M16 14 L23.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-  <circle cx="23.5" cy="8" r="1.5" fill="currentColor"/>
-  <line x1="23.9" y1="6.9" x2="27.5" y2="-24.9" stroke="#7A6A45" stroke-width="1" stroke-linecap="round"/>
-  <g transform="translate(27.5 -24.9) rotate(-8)">
-    <rect x="0" y="-9" width="14" height="9" fill="#2B2118"/>
-    <rect x="0" y="-9" width="3.5" height="4.5" fill="#FBF6EC"/>
-    <rect x="7" y="-9" width="3.5" height="4.5" fill="#FBF6EC"/>
-    <rect x="3.5" y="-4.5" width="3.5" height="4.5" fill="#FBF6EC"/>
-    <rect x="10.5" y="-4.5" width="3.5" height="4.5" fill="#FBF6EC"/>
-  </g>
-</symbol>
 </defs>
 </svg>
 
@@ -661,7 +644,21 @@ function renderMountain(){
   const finished = pct >= 1;
   const figureSvg = finished
     ? `<g transform="translate(${(hikerPoint.x-16).toFixed(1)} ${(hikerPoint.y-23).toFixed(1)})" style="color:var(--ink)">
-        <use href="#victoryFigure" width="40" height="55" style="overflow:visible"/>
+        <circle cx="16" cy="10" r="2.6" fill="none" stroke="currentColor" stroke-width="1.3"/>
+        <path d="M16 12.6 L16 23" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M16 15 L9 17.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M16 23 L10 30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M16 23 L22 30" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <path d="M16 14 L23.5 8" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
+        <circle cx="23.5" cy="8" r="1.5" fill="currentColor"/>
+        <line x1="23.9" y1="6.9" x2="27.5" y2="-24.9" stroke="#7A6A45" stroke-width="1" stroke-linecap="round"/>
+        <g transform="translate(27.5 -24.9) rotate(-8)">
+          <rect x="0" y="-9" width="14" height="9" fill="#2B2118"/>
+          <rect x="0" y="-9" width="3.5" height="4.5" fill="#FBF6EC"/>
+          <rect x="7" y="-9" width="3.5" height="4.5" fill="#FBF6EC"/>
+          <rect x="3.5" y="-4.5" width="3.5" height="4.5" fill="#FBF6EC"/>
+          <rect x="10.5" y="-4.5" width="3.5" height="4.5" fill="#FBF6EC"/>
+        </g>
       </g>`
     : `<g transform="translate(${(hikerPoint.x-8).toFixed(1)} ${(hikerPoint.y-20).toFixed(1)})" style="color:var(--ink)">
         <use href="#hikerIcon" width="16" height="22"/>
