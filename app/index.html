@@ -585,7 +585,7 @@ function computeTotals(){
 }
 
 // Точные точки утверждённого макета (витрина, вариант "Лесной зелёный") — не менять форму.
-const MOUNTAIN_RIDGE = [[0,57.5],[24,72.5],[46,30],[70,55],[92,37.5],[112,62.5]];
+const MOUNTAIN_RIDGE = [[0,57.5],[24,72.5],[46,30],[70,55],[92,37.5],[112,62.5],[126,52.5],[150,10],[172,42.5],[190,25],[214,15],[234,45],[256,27.5]];
 const MOUNTAIN_LAYER1 = "M0 100 L0 57.5 L24 72.5 L46 30 L70 55 L92 37.5 L112 62.5 L130 100 Z";
 const MOUNTAIN_LAYER2 = "M60 100 L60 62.5 L84 77.5 L104 32.5 L126 52.5 L150 10 L172 42.5 L190 25 L206 100 Z";
 const MOUNTAIN_LAYER3 = "M170 100 L170 55 L192 70 L214 15 L234 45 L256 27.5 L256 100 Z";
@@ -619,7 +619,7 @@ function renderMountain(){
       <g transform="translate(${(hikerPoint.x-8).toFixed(1)} ${(hikerPoint.y-20).toFixed(1)})" style="color:var(--ink)">
         <use href="#hikerIcon" width="16" height="22"/>
       </g>
-      <text x="246" y="15" font-size="13">🏁</text>
+      <text x="248" y="15.5" font-size="13">🏁</text>
     </svg>
   `;
   document.getElementById('mountainSvgHolder').innerHTML = svg;
