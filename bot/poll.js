@@ -30,8 +30,17 @@ async function main() {
     if (text.startsWith('/start')) {
       const parts = text.split(' ');
       const trackerId = parts[1];
+      const username = msg.from && msg.from.username ? msg.from.username : null;
+      const firstName = msg.from && msg.from.first_name ? msg.from.first_name : null;
+
       if (!trackerId) {
-        await sendMessage(chatId, 'Чтобы подключить напоминания, открой свой трекер и нажми там кнопку «Подключить Telegram» — она сама пришлёт сюда правильную ссылку.');
+        const q = await db.collection('trackers').where('telegram_chat_id', '==', chatId).get();
+        if (!q.empty) {
+          const already = q.docs[0].data();
+          await sendMessage(chatId, `✅ Вы уже подключены к трекеру «${already.title}» — напоминания приходят.`, { persistentKeyboard: true });
+        } else {
+          await sendMessage(chatId, 'Чтобы подключить напоминания, открой свой трекер и нажми там кнопку «Подключить Telegram» — она сама пришлёт сюда правильную ссылку.');
+        }
         continue;
       }
       const trackerSnap = await db.collection('trackers').doc(trackerId).get();
@@ -39,13 +48,17 @@ async function main() {
         await sendMessage(chatId, 'Не нашёл такой трекер — проверь, что перешёл по ссылке из своего приложения.');
         continue;
       }
-      const username = msg.from && msg.from.username ? msg.from.username : null;
-      await db.collection('trackers').doc(trackerId).update({ telegram_chat_id: chatId, telegram_username: username });
-      await sendMessage(
-        chatId,
-        '✅ Готово! Раз в день, в 17:00 по твоему времени, буду присылать напоминание — чтобы дни челленджа реже пропускались.',
-        { persistentKeyboard: true }
-      );
+      const alreadyConnected = trackerSnap.data().telegram_chat_id === chatId;
+      await db.collection('trackers').doc(trackerId).update({ telegram_chat_id: chatId, telegram_username: username, telegram_first_name: firstName });
+      if (alreadyConnected) {
+        await sendMessage(chatId, `✅ Вы уже подключены к трекеру «${trackerSnap.data().title}» — напоминания приходят.`, { persistentKeyboard: true });
+      } else {
+        await sendMessage(
+          chatId,
+          '✅ Готово! Раз в день, в 17:00 по твоему времени, буду присылать напоминание — чтобы дни челленджа реже пропускались.',
+          { persistentKeyboard: true }
+        );
+      }
       continue;
     }
 

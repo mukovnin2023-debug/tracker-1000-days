@@ -902,6 +902,7 @@ async function openSettings(){
     if(fresh.exists()){
       tracker.telegram_chat_id = fresh.data().telegram_chat_id || null;
       tracker.telegram_username = fresh.data().telegram_username || null;
+      tracker.telegram_first_name = fresh.data().telegram_first_name || null;
     }
   }catch(e){}
   updateTelegramCard();
@@ -910,7 +911,7 @@ function updateTelegramCard(){
   const connected = !!tracker.telegram_chat_id;
   document.getElementById('telegramConnectedStatus').style.display = connected ? 'flex' : 'none';
   document.getElementById('telegramConnectLink').style.display = connected ? 'none' : '';
-  document.getElementById('telegramUsername').textContent = tracker.telegram_username ? ` (@${tracker.telegram_username})` : '';
+  document.getElementById('telegramUsername').textContent = tracker.telegram_username ? ` (@${tracker.telegram_username})` : (tracker.telegram_first_name ? ` (${tracker.telegram_first_name})` : '');
 }
 function closeSettings(){ hide('settingsScreen'); show('mainApp'); }
 
@@ -956,10 +957,11 @@ function bindSettingsScreen(){
       'Тогда бот перестанет писать вам в Telegram. Подключить обратно можно в любой момент той же кнопкой.',
       async () => {
         try{
-          await updateDoc(doc(db, 'trackers', trackerId), { telegram_chat_id: null, telegram_username: null });
+          await updateDoc(doc(db, 'trackers', trackerId), { telegram_chat_id: null, telegram_username: null, telegram_first_name: null });
         }catch(e){}
         tracker.telegram_chat_id = null;
         tracker.telegram_username = null;
+        tracker.telegram_first_name = null;
         updateTelegramCard();
       }
     );
