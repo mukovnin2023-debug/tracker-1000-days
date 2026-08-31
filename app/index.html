@@ -952,8 +952,8 @@ function bindSettingsScreen(){
 
   document.getElementById('telegramDisconnectBtn').addEventListener('click', () => {
     askConfirm(
-      'Отключить уведомления?',
-      'Бот перестанет присылать напоминания и похвалу. Подключить обратно можно в любой момент той же кнопкой.',
+      'Вы уверены, что хотите отключить?',
+      'Тогда вам не будут приходить оповещения в Telegram — ни напоминания, ни похвала. Подключить обратно можно в любой момент той же кнопкой.',
       async () => {
         try{
           await updateDoc(doc(db, 'trackers', trackerId), { telegram_chat_id: null, telegram_username: null });
