@@ -324,8 +324,9 @@ footer{ text-align:center; margin-top:18px; }
       <p style="font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 12px;">
         Бот раз в день, в 17:00 по вашему местному времени, напишет: если день ещё не заполнен — напомнит, если уже заполнен — похвалит. Команда /status покажет прогресс в любой момент.
       </p>
+      <div id="telegramConnectedStatus" style="display:none;font-size:13px;color:var(--accent);font-weight:600;">✅ Telegram подключён</div>
       <a id="telegramConnectLink" href="#" target="_blank" rel="noopener">
-        <button class="secondary">Подключить Telegram →</button>
+        <button class="secondary" id="telegramConnectBtn">Подключить Telegram →</button>
       </a>
     </div>
 
@@ -885,7 +886,7 @@ function escapeHtml(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-function openSettings(){
+async function openSettings(){
   document.getElementById('stTitle').value = tracker.title;
   document.getElementById('stGoal').value = tracker.goal || '';
   document.getElementById('stDays').value = tracker.target_days;
@@ -893,6 +894,16 @@ function openSettings(){
   document.getElementById('stStyle').value = tracker.style || 'paper';
   hide('mainApp');
   show('settingsScreen');
+  try{
+    const fresh = await getDoc(doc(db, 'trackers', trackerId));
+    if(fresh.exists()) tracker.telegram_chat_id = fresh.data().telegram_chat_id || null;
+  }catch(e){}
+  updateTelegramCard();
+}
+function updateTelegramCard(){
+  const connected = !!tracker.telegram_chat_id;
+  document.getElementById('telegramConnectedStatus').style.display = connected ? '' : 'none';
+  document.getElementById('telegramConnectLink').style.display = connected ? 'none' : '';
 }
 function closeSettings(){ hide('settingsScreen'); show('mainApp'); }
 
