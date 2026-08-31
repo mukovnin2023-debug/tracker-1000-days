@@ -245,8 +245,6 @@ footer{ text-align:center; margin-top:18px; }
       <div class="mountain-sub" id="mountainSub">осталось 0 дней · финиш —</div>
     </div>
 
-    <div class="stat-row" id="statRow"></div>
-
     <div class="track-title">Календарь дней</div>
     <div class="grid-outer">
       <div class="grid" id="grid"></div>
@@ -705,18 +703,6 @@ function render(){
   const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
 
   renderMountain();
-
-  let streak = 0;
-  for(let n=rawToday; n>=1; n--){
-    const e = entriesByDay[n];
-    if(e && e.done) streak++;
-    else break;
-  }
-  document.getElementById('statRow').innerHTML = `
-    <div class="stat"><div class="num">${rawToday}</div><span class="label">текущий день</span></div>
-    <div class="stat"><div class="num">${doneCount}/${targetDays}</div><span class="label">сделано</span></div>
-    <div class="stat"><div class="num">${streak}</div><span class="label">серия подряд</span></div>
-  `;
 
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
