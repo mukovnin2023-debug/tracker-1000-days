@@ -588,7 +588,7 @@ function computeTotals(){
 const MOUNTAIN_LAYER1 = "M0 100 L0 57.5 L24 72.5 L46 30 L70 55 L92 37.5 L112 62.5 L130 100 Z";
 const MOUNTAIN_LAYER2 = "M60 100 L60 62.5 L84 77.5 L104 32.5 L126 52.5 L150 10 L172 42.5 L190 25 L206 100 Z";
 const MOUNTAIN_LAYER3 = "M170 100 L170 55 L192 70 L214 15 L234 45 L256 27.5 L256 100 Z";
-const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 100;
+const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 100, MOUNTAIN_MAX_X = 256;
 
 // Верхний контур каждого хребта (без точек закрытия по земле) — используется только
 // для расчёта, где реально проходит верхняя видимая грань картинки в каждой точке x.
@@ -620,7 +620,7 @@ const ENVELOPE_STEPS = 130;
 function buildEnvelope(){
   const pts = [];
   for(let i=0;i<=ENVELOPE_STEPS;i++){
-    const x = i/ENVELOPE_STEPS * MOUNTAIN_WIDTH;
+    const x = i/ENVELOPE_STEPS * MOUNTAIN_MAX_X;
     pts.push([x, envelopeY(x)]);
   }
   return pts;
@@ -628,7 +628,7 @@ function buildEnvelope(){
 const MOUNTAIN_ENVELOPE = buildEnvelope();
 
 function pointOnEnvelope(pct){
-  const x = Math.max(0, Math.min(1, pct)) * MOUNTAIN_WIDTH;
+  const x = Math.max(0, Math.min(1, pct)) * MOUNTAIN_MAX_X;
   return { x, y: envelopeY(x) };
 }
 
