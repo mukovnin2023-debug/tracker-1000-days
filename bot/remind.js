@@ -1,4 +1,6 @@
-const { initDb, sendMessage, computeProgress, SITE_URL } = require('./common');
+const { initDb, sendMessage, computeProgress, localHourInTz, SITE_URL } = require('./common');
+
+const REMIND_HOUR = 17;
 
 async function main() {
   const db = initDb();
@@ -8,8 +10,12 @@ async function main() {
     const tracker = { id: doc.id, ...doc.data() };
     if (!tracker.telegram_chat_id) continue;
 
+    const tz = tracker.timezone || 'Europe/Moscow';
+    if (localHourInTz(tz) !== REMIND_HOUR) continue;
+
     const p = await computeProgress(db, tracker);
     if (p.remaining <= 0) continue; // челлендж пройден — напоминания больше не нужны
+    if (tracker.last_reminder_sent_date === p.todayIso) continue; // уже отправляли сегодня (по его местному времени)
 
     const todayEntry = p.entryByDay[p.rawToday];
     const doneToday = !!(todayEntry && todayEntry.done);
@@ -19,6 +25,7 @@ async function main() {
       : `Напоминание: день ${p.rawToday} из ${p.totalSlots} по «${tracker.title}» ещё не заполнен.\n«${tracker.checkbox_label}» — сделано сегодня?\n\n${SITE_URL}?id=${tracker.id}`;
 
     await sendMessage(tracker.telegram_chat_id, text);
+    await db.collection('trackers').doc(tracker.id).update({ last_reminder_sent_date: p.todayIso });
   }
 }
 

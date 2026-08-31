@@ -322,7 +322,7 @@ footer{ text-align:center; margin-top:18px; }
       <span class="eyebrow-sm">Напоминания</span>
       <h2>Подключить Telegram</h2>
       <p style="font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 12px;">
-        Бот раз в день (в 17:00 по Москве) напишет: если день ещё не заполнен — напомнит, если уже заполнен — похвалит. Команда /status покажет прогресс в любой момент.
+        Бот раз в день, в 17:00 по вашему местному времени, напишет: если день ещё не заполнен — напомнит, если уже заполнен — похвалит. Команда /status покажет прогресс в любой момент.
       </p>
       <a id="telegramConnectLink" href="#" target="_blank" rel="noopener">
         <button class="secondary">Подключить Telegram →</button>
@@ -479,6 +479,14 @@ async function init(){
   tracker = trackerSnap.data();
   applyStyle();
 
+  try{
+    const clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if(clientTz && clientTz !== tracker.timezone){
+      updateDoc(doc(db, 'trackers', trackerId), { timezone: clientTz }).catch(()=>{});
+      tracker.timezone = clientTz;
+    }
+  }catch(e){}
+
   await loadEntries();
 
   document.getElementById('pageTitle').textContent = tracker.title;
@@ -532,10 +540,13 @@ function bindStartScreen(){
     startBtn.textContent = 'Создаю…';
     let newId;
     try{
+      let clientTz = 'Europe/Moscow';
+      try{ clientTz = Intl.DateTimeFormat().resolvedOptions().timeZone || clientTz; }catch(e){}
       const docRef = await addDoc(collection(db, 'trackers'), {
         title, goal: goal || null, target_days: days,
         checkbox_label: checkLabel, category, style,
         start_date: dateStr(new Date()),
+        timezone: clientTz,
         created_at: serverTimestamp()
       });
       newId = docRef.id;

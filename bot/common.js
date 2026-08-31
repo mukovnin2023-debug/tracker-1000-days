@@ -25,21 +25,34 @@ function sendMessage(chatId, text) {
   return tg('sendMessage', { chat_id: chatId, text, disable_web_page_preview: true });
 }
 
-// Та же логика, что в app/index.html — день считается от start_date (местная дата),
-// финиш растёт по факту пропусков.
+// Локальная дата (YYYY-MM-DD) в часовом поясе пользователя — тот же принцип,
+// что и в самом приложении (getFullYear/getMonth/getDate, но для конкретного tz).
+function localDateInTz(tz) {
+  try {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date());
+  } catch (e) {
+    return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Moscow' }).format(new Date());
+  }
+}
+
+function localHourInTz(tz) {
+  try {
+    return Number(new Intl.DateTimeFormat('en-US', { timeZone: tz, hour: '2-digit', hour12: false }).format(new Date()));
+  } catch (e) {
+    return Number(new Intl.DateTimeFormat('en-US', { timeZone: 'Europe/Moscow', hour: '2-digit', hour12: false }).format(new Date()));
+  }
+}
+
 function dayNumberFor(startDate, isoDate) {
   const start = new Date(startDate + 'T00:00:00Z');
   const cur = new Date(isoDate + 'T00:00:00Z');
   return Math.floor((cur - start) / 86400000) + 1;
 }
 
-function todayMskIso() {
-  const mskNow = new Date(Date.now() + 3 * 3600 * 1000);
-  return mskNow.toISOString().slice(0, 10);
-}
-
 async function computeProgress(db, tracker) {
-  const rawToday = Math.max(1, dayNumberFor(tracker.start_date, todayMskIso()));
+  const tz = tracker.timezone || 'Europe/Moscow';
+  const todayIso = localDateInTz(tz);
+  const rawToday = Math.max(1, dayNumberFor(tracker.start_date, todayIso));
   const entriesSnap = await db.collection('trackers').doc(tracker.id).collection('entries').get();
   let doneCount = 0;
   const entryByDay = {};
@@ -51,7 +64,7 @@ async function computeProgress(db, tracker) {
   const missedSoFar = Math.max(0, (rawToday - 1) - doneCount);
   const totalSlots = Math.max(tracker.target_days + missedSoFar, rawToday);
   const remaining = Math.max(0, tracker.target_days - doneCount);
-  return { rawToday, doneCount, totalSlots, remaining, entryByDay };
+  return { rawToday, doneCount, totalSlots, remaining, entryByDay, todayIso };
 }
 
-module.exports = { initDb, tg, sendMessage, dayNumberFor, todayMskIso, computeProgress, SITE_URL };
+module.exports = { initDb, tg, sendMessage, dayNumberFor, localDateInTz, localHourInTz, computeProgress, SITE_URL };
