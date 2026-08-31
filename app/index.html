@@ -282,6 +282,17 @@ footer{ text-align:center; margin-top:18px; }
       </div>
     </div>
 
+    <div class="card" id="telegramCard">
+      <span class="eyebrow-sm">Напоминания</span>
+      <h2>Подключить Telegram</h2>
+      <p style="font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 12px;">
+        Бот раз в день (в 18:00 по Москве) напомнит заполнить день, если вы ещё этого не сделали, и по команде /status покажет прогресс в любой момент.
+      </p>
+      <a id="telegramConnectLink" href="#" target="_blank" rel="noopener">
+        <button class="secondary">Подключить Telegram →</button>
+      </a>
+    </div>
+
     <footer>
       <button class="author-link" id="authorLinkBtn">Автор трекера →</button>
     </footer>
@@ -471,6 +482,7 @@ async function init(){
   document.getElementById('pageTitle').textContent = tracker.title;
   document.getElementById('doneLabel').textContent = tracker.checkbox_label;
   document.getElementById('modalDoneLabel').textContent = tracker.checkbox_label;
+  document.getElementById('telegramConnectLink').href = `https://t.me/tracker_az_bot?start=${trackerId}`;
 
   hide('loadingScreen');
   show('mainApp');
