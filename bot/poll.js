@@ -37,6 +37,7 @@ async function main() {
         const q = await db.collection('trackers').where('telegram_chat_id', '==', chatId).get();
         if (!q.empty) {
           const already = q.docs[0].data();
+          await q.docs[0].ref.update({ telegram_username: username, telegram_first_name: firstName });
           await sendMessage(chatId, `✅ Вы уже подключены к трекеру «${already.title}» — напоминания приходят.`, { persistentKeyboard: true });
         } else {
           await sendMessage(chatId, 'Чтобы подключить напоминания, открой свой трекер и нажми там кнопку «Подключить Telegram» — она сама пришлёт сюда правильную ссылку.');
