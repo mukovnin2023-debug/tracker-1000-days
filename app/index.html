@@ -114,7 +114,7 @@ button:active{ transform:translateY(1px); }
 .modal{ background:var(--bg); width:100%; max-width:640px; border-radius:14px 14px 0 0; padding:18px 16px 24px; border:1px solid var(--border); border-bottom:none; max-height:88vh; overflow-y:auto; }
 .modal-close{ display:block; margin:14px auto 0; background:none; border:none; color:var(--sub); font-family:var(--font-display); font-size:15px; text-decoration:underline; cursor:pointer; }
 .mountain-card{ margin-bottom:18px; }
-.mountain-card svg{ display:block; width:100%; height:auto; aspect-ratio:280/100; }
+.mountain-card svg{ display:block; width:100%; height:auto; aspect-ratio:260/100; overflow:visible; }
 .mountain-cap{ display:flex; justify-content:center; font-size:12.5px; color:var(--sub); margin-top:4px; }
 .mountain-cap b{ color:var(--ink); margin:0 3px; }
 .mountain-sub{ text-align:center; font-size:11.5px; color:var(--sub); margin-top:6px; }
@@ -585,11 +585,11 @@ function computeTotals(){
 }
 
 // Точные точки утверждённого макета (витрина, вариант "Лесной зелёный") — не менять форму.
-const MOUNTAIN_RIDGE = [[20,57.5],[44,72.5],[66,30],[90,55],[112,37.5],[132,62.5]];
-const MOUNTAIN_LAYER1 = "M20 100 L20 57.5 L44 72.5 L66 30 L90 55 L112 37.5 L132 62.5 L150 100 Z";
-const MOUNTAIN_LAYER2 = "M80 100 L80 62.5 L104 77.5 L124 32.5 L146 52.5 L170 10 L192 42.5 L210 25 L226 100 Z";
-const MOUNTAIN_LAYER3 = "M190 100 L190 55 L212 70 L234 15 L254 45 L276 27.5 L276 100 Z";
-const MOUNTAIN_WIDTH = 280, MOUNTAIN_HEIGHT = 100;
+const MOUNTAIN_RIDGE = [[0,57.5],[24,72.5],[46,30],[70,55],[92,37.5],[112,62.5]];
+const MOUNTAIN_LAYER1 = "M0 100 L0 57.5 L24 72.5 L46 30 L70 55 L92 37.5 L112 62.5 L130 100 Z";
+const MOUNTAIN_LAYER2 = "M60 100 L60 62.5 L84 77.5 L104 32.5 L126 52.5 L150 10 L172 42.5 L190 25 L206 100 Z";
+const MOUNTAIN_LAYER3 = "M170 100 L170 55 L192 70 L214 15 L234 45 L256 27.5 L256 100 Z";
+const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 100;
 
 function pointAlongRidge(pct){
   const ridge = MOUNTAIN_RIDGE;
@@ -619,7 +619,7 @@ function renderMountain(){
       <g transform="translate(${(hikerPoint.x-8).toFixed(1)} ${(hikerPoint.y-20).toFixed(1)})" style="color:var(--ink)">
         <use href="#hikerIcon" width="16" height="22"/>
       </g>
-      <text x="266" y="15" font-size="13">🏁</text>
+      <text x="246" y="15" font-size="13">🏁</text>
     </svg>
   `;
   document.getElementById('mountainSvgHolder').innerHTML = svg;
