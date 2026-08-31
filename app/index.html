@@ -102,23 +102,31 @@ button:active{ transform:translateY(1px); }
 }
 .legend{ display:flex; gap:14px; flex-wrap:wrap; margin-top:12px; font-size:11.5px; color:var(--sub); }
 .legend span{ display:inline-flex; align-items:center; gap:5px; }
-.legend i{ width:10px;height:10px;border-radius:2px;display:inline-block; }
+.legend i{ width:10px;height:10px;border-radius:2px;display:inline-block; position:relative; }
+.legend i.done-swatch::after{
+  content:''; position:absolute; inset:8%;
+  background-image:
+    linear-gradient(45deg, transparent 40%, var(--accent) 42%, var(--accent) 58%, transparent 60%),
+    linear-gradient(-45deg, transparent 40%, var(--accent) 42%, var(--accent) 58%, transparent 60%);
+}
 .modal-backdrop{ position:fixed; inset:0; background:rgba(20,16,10,0.45); display:none; align-items:flex-end; justify-content:center; z-index:50; }
 .modal-backdrop.open{ display:flex; }
 .modal{ background:var(--bg); width:100%; max-width:640px; border-radius:14px 14px 0 0; padding:18px 16px 24px; border:1px solid var(--border); border-bottom:none; max-height:88vh; overflow-y:auto; }
 .modal-close{ display:block; margin:14px auto 0; background:none; border:none; color:var(--sub); font-family:var(--font-display); font-size:15px; text-decoration:underline; cursor:pointer; }
-.mountain-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:14px 14px 10px; margin-bottom:18px; }
-.mountain-cap{ display:flex; justify-content:center; font-size:12.5px; color:var(--sub); margin-top:2px; }
-.mountain-cap b{ color:var(--ink); }
+.mountain-card{ background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 10px 10px; margin-bottom:18px; }
+.mountain-card svg{ display:block; width:100%; height:auto; aspect-ratio:260/100; }
+.mountain-cap{ display:flex; justify-content:center; font-size:12.5px; color:var(--sub); margin-top:4px; }
+.mountain-cap b{ color:var(--ink); margin:0 3px; }
 .mountain-sub{ text-align:center; font-size:11.5px; color:var(--sub); margin-top:6px; }
-.mountain-sub b{ font-family:var(--font-display); color:var(--accent); font-size:14px; font-weight:700; }
+.mountain-sub b{ color:var(--accent); font-weight:700; margin:0 3px; }
 .start-card p{ font-size:14px; color:var(--sub); line-height:1.5; margin:0 0 4px; }
 .consent-row{ display:flex; align-items:flex-start; gap:10px; font-size:12px; color:var(--sub); line-height:1.5; margin:14px 0; }
 .consent-row input{ width:18px;height:18px; flex:0 0 18px; margin-top:2px; }
 .consent-row a{ color:var(--ink); }
 .saved-banner{ background:var(--today-fill); border:1px solid var(--today-border); border-radius:var(--radius); padding:12px 14px; font-size:13px; line-height:1.5; margin-bottom:18px; }
 .saved-banner b{ display:block; margin-bottom:4px; }
-.link-note{ font-size:11.5px; color:var(--sub); background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 12px; margin-bottom:18px; line-height:1.5; }
+.link-note{ font-size:11.5px; color:var(--sub); background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 34px 10px 12px; margin-bottom:18px; line-height:1.5; position:relative; }
+.link-note .close-x{ position:absolute; top:6px; right:8px; background:none; border:none; font-size:16px; line-height:1; color:var(--sub); cursor:pointer; padding:4px; }
 .top-nav{ display:flex; gap:8px; justify-content:flex-end; margin-bottom:6px; }
 .top-nav button{ font-size:12px; padding:7px 11px; }
 footer{ text-align:center; margin-top:18px; }
@@ -227,8 +235,9 @@ footer{ text-align:center; margin-top:18px; }
       В Safari нажмите «Поделиться» → «На экран Домой». Это единственный способ вернуться именно к вашему трекеру.
     </div>
 
-    <div class="link-note">
+    <div class="link-note" id="linkNote">
       Эта ссылка — личная. Если переслать её кому-то, он увидит и сможет изменить ваши записи. Ссылка одинаково работает и на телефоне, и на компьютере — просто открывайте её там, где нужно.
+      <button class="close-x" id="linkNoteClose" aria-label="Скрыть">×</button>
     </div>
 
     <div class="mountain-card">
@@ -243,7 +252,7 @@ footer{ text-align:center; margin-top:18px; }
     <div class="grid-outer">
       <div class="grid" id="grid"></div>
       <div class="legend">
-        <span><i style="background:var(--path-bg);border:1px solid var(--accent)"></i> сделано</span>
+        <span><i class="done-swatch" style="background:var(--path-bg);border:1px solid var(--border)"></i> сделано</span>
         <span><i style="background:var(--miss-bg);border:1px solid var(--miss-border)"></i> пропуск</span>
         <span><i style="background:var(--today-fill);border:1px solid var(--today-border)"></i> сегодня</span>
         <span><i style="background:transparent;border:1px dashed var(--border)"></i> впереди</span>
@@ -361,10 +370,11 @@ footer{ text-align:center; margin-top:18px; }
 <div class="modal-backdrop" id="authorBackdrop">
   <div class="modal">
     <span class="eyebrow-sm">Автор трекера</span>
-    <h2>Вадим</h2>
+    <h2 id="authorName">Вадим</h2>
     <p style="font-size:14px;color:var(--sub);line-height:1.5;margin:0 0 16px;">
-      Делаю Launchstats — сервис аналитики для тех, кто продаёт через блог и соцсети,
-      и веду блог о его создании. Этот трекер — часть моего собственного 1000-дневного челленджа.
+      Продюсер, предприниматель и создатель сервиса <b style="color:var(--ink)">Launchstats.ru</b> —
+      сервиса аналитики для тех, кто продаёт через блог и соцсети. Этот трекер — часть моего
+      собственного 1000-дневного челленджа.
     </p>
     <div class="btn-row">
       <a id="instagramLink" href="https://www.instagram.com/az_vadim" target="_blank" rel="noopener">
@@ -463,6 +473,13 @@ async function init(){
   hide('loadingScreen');
   show('mainApp');
   if(isNew){ show('savedBanner'); }
+  let linkNoteDismissed = false;
+  try{ linkNoteDismissed = localStorage.getItem('link_note_dismissed_'+trackerId) === '1'; }catch(e){}
+  if(linkNoteDismissed){ hide('linkNote'); }
+  document.getElementById('linkNoteClose').addEventListener('click', () => {
+    hide('linkNote');
+    try{ localStorage.setItem('link_note_dismissed_'+trackerId, '1'); }catch(e){}
+  });
   bindAppScreen();
   bindSettingsScreen();
   render();
@@ -568,11 +585,11 @@ function computeTotals(){
 }
 
 // Точные точки утверждённого макета (витрина, вариант "Лесной зелёный") — не менять форму.
-const MOUNTAIN_RIDGE = [[0,46],[24,58],[46,24],[70,44],[92,30],[112,50]];
-const MOUNTAIN_LAYER1 = "M0 80 L0 46 L24 58 L46 24 L70 44 L92 30 L112 50 L130 80 Z";
-const MOUNTAIN_LAYER2 = "M60 80 L60 50 L84 62 L104 26 L126 42 L150 8 L172 34 L190 20 L206 80 Z";
-const MOUNTAIN_LAYER3 = "M170 80 L170 44 L192 56 L214 12 L234 36 L256 22 L256 80 Z";
-const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 80;
+const MOUNTAIN_RIDGE = [[0,57.5],[24,72.5],[46,30],[70,55],[92,37.5],[112,62.5]];
+const MOUNTAIN_LAYER1 = "M0 100 L0 57.5 L24 72.5 L46 30 L70 55 L92 37.5 L112 62.5 L130 100 Z";
+const MOUNTAIN_LAYER2 = "M60 100 L60 62.5 L84 77.5 L104 32.5 L126 52.5 L150 10 L172 42.5 L190 25 L206 100 Z";
+const MOUNTAIN_LAYER3 = "M170 100 L170 55 L192 70 L214 15 L234 45 L256 27.5 L256 100 Z";
+const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 100;
 
 function pointAlongRidge(pct){
   const ridge = MOUNTAIN_RIDGE;
@@ -602,7 +619,7 @@ function renderMountain(){
       <g transform="translate(${(hikerPoint.x-8).toFixed(1)} ${(hikerPoint.y-20).toFixed(1)})" style="color:var(--ink)">
         <use href="#hikerIcon" width="16" height="22"/>
       </g>
-      <text x="246" y="12" font-size="13">🏁</text>
+      <text x="246" y="15" font-size="13">🏁</text>
     </svg>
   `;
   document.getElementById('mountainSvgHolder').innerHTML = svg;
@@ -650,10 +667,13 @@ function render(){
     cell.dataset.day = n;
     const e = entriesByDay[n];
     let cls = 'day-cell';
-    if(n===rawToday) cls += ' today';
-    else if(n>rawToday) cls += ' future';
-    else if(e && e.done) cls += ' done';
-    else cls += ' missed';
+    if(n>rawToday){
+      cls += ' future';
+    } else {
+      if(n===rawToday) cls += ' today';
+      if(e && e.done) cls += ' done';
+      else if(n<rawToday) cls += ' missed';
+    }
     cell.className = cls;
     cell.title = `День ${n}`;
     if(n<=rawToday) cell.addEventListener('click', ()=>openDay(n));
