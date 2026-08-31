@@ -39,7 +39,8 @@ async function main() {
         await sendMessage(chatId, 'Не нашёл такой трекер — проверь, что перешёл по ссылке из своего приложения.');
         continue;
       }
-      await db.collection('trackers').doc(trackerId).update({ telegram_chat_id: chatId });
+      const username = msg.from && msg.from.username ? msg.from.username : null;
+      await db.collection('trackers').doc(trackerId).update({ telegram_chat_id: chatId, telegram_username: username });
       await sendMessage(
         chatId,
         '✅ Готово! Раз в день, в 17:00 по твоему времени, буду присылать напоминание — чтобы дни челленджа реже пропускались.',

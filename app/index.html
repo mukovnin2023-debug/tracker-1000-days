@@ -324,7 +324,10 @@ footer{ text-align:center; margin-top:18px; }
       <p style="font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 12px;">
         Бот раз в день, в 17:00 по вашему местному времени, напишет: если день ещё не заполнен — напомнит, если уже заполнен — похвалит. Команда /status покажет прогресс в любой момент.
       </p>
-      <div id="telegramConnectedStatus" style="display:none;font-size:13px;color:var(--accent);font-weight:600;">✅ Telegram подключён</div>
+      <div id="telegramConnectedStatus" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;">
+        <span style="color:var(--accent);font-weight:600;">✅ Telegram подключён<span id="telegramUsername"></span></span>
+        <button class="secondary" id="telegramDisconnectBtn" style="font-size:12px;padding:4px 10px;">Отключить уведомления</button>
+      </div>
       <a id="telegramConnectLink" href="#" target="_blank" rel="noopener">
         <button class="secondary" id="telegramConnectBtn">Подключить Telegram →</button>
       </a>
@@ -896,14 +899,18 @@ async function openSettings(){
   show('settingsScreen');
   try{
     const fresh = await getDoc(doc(db, 'trackers', trackerId));
-    if(fresh.exists()) tracker.telegram_chat_id = fresh.data().telegram_chat_id || null;
+    if(fresh.exists()){
+      tracker.telegram_chat_id = fresh.data().telegram_chat_id || null;
+      tracker.telegram_username = fresh.data().telegram_username || null;
+    }
   }catch(e){}
   updateTelegramCard();
 }
 function updateTelegramCard(){
   const connected = !!tracker.telegram_chat_id;
-  document.getElementById('telegramConnectedStatus').style.display = connected ? '' : 'none';
+  document.getElementById('telegramConnectedStatus').style.display = connected ? 'flex' : 'none';
   document.getElementById('telegramConnectLink').style.display = connected ? 'none' : '';
+  document.getElementById('telegramUsername').textContent = tracker.telegram_username ? ` (@${tracker.telegram_username})` : '';
 }
 function closeSettings(){ hide('settingsScreen'); show('mainApp'); }
 
@@ -941,6 +948,21 @@ function bindSettingsScreen(){
     }
     flash.classList.add('show');
     setTimeout(()=>flash.classList.remove('show'), 2000);
+  });
+
+  document.getElementById('telegramDisconnectBtn').addEventListener('click', () => {
+    askConfirm(
+      'Отключить уведомления?',
+      'Бот перестанет присылать напоминания и похвалу. Подключить обратно можно в любой момент той же кнопкой.',
+      async () => {
+        try{
+          await updateDoc(doc(db, 'trackers', trackerId), { telegram_chat_id: null, telegram_username: null });
+        }catch(e){}
+        tracker.telegram_chat_id = null;
+        tracker.telegram_username = null;
+        updateTelegramCard();
+      }
+    );
   });
 
   document.getElementById('stResetBtn').addEventListener('click', () => {
