@@ -584,31 +584,63 @@ function computeTotals(){
   return { targetDays, rawToday, doneCount, totalSlots };
 }
 
-// Точные точки утверждённого макета (витрина, вариант "Лесной зелёный") — не менять форму.
-const MOUNTAIN_RIDGE = [[0,57.5],[24,72.5],[46,30],[70,55],[92,37.5],[112,62.5],[126,52.5],[150,10],[172,42.5],[190,25],[214,15],[234,45],[256,27.5]];
+// Те же залитые хребты, что и раньше (витрина, вариант "Лесной зелёный") — форма картинки не меняется.
 const MOUNTAIN_LAYER1 = "M0 100 L0 57.5 L24 72.5 L46 30 L70 55 L92 37.5 L112 62.5 L130 100 Z";
 const MOUNTAIN_LAYER2 = "M60 100 L60 62.5 L84 77.5 L104 32.5 L126 52.5 L150 10 L172 42.5 L190 25 L206 100 Z";
 const MOUNTAIN_LAYER3 = "M170 100 L170 55 L192 70 L214 15 L234 45 L256 27.5 L256 100 Z";
 const MOUNTAIN_WIDTH = 260, MOUNTAIN_HEIGHT = 100;
 
-function pointAlongRidge(pct){
-  const ridge = MOUNTAIN_RIDGE;
-  const totalLen = ridge.length - 1;
-  const pos = Math.max(0, Math.min(1, pct)) * totalLen;
-  const k = Math.min(Math.floor(pos), totalLen-1);
-  const t = pos - k;
-  const a = ridge[k], b = ridge[k+1];
-  return { x: a[0]+(b[0]-a[0])*t, y: a[1]+(b[1]-a[1])*t, index:k, t };
+// Верхний контур каждого хребта (без точек закрытия по земле) — используется только
+// для расчёта, где реально проходит верхняя видимая грань картинки в каждой точке x.
+const ROOF_1 = [[0,57.5],[24,72.5],[46,30],[70,55],[92,37.5],[112,62.5],[130,100]];
+const ROOF_2 = [[60,62.5],[84,77.5],[104,32.5],[126,52.5],[150,10],[172,42.5],[190,25],[206,100]];
+const ROOF_3 = [[170,55],[192,70],[214,15],[234,45],[256,27.5]];
+
+function roofAt(list, x){
+  if(x < list[0][0] || x > list[list.length-1][0]) return null;
+  for(let i=0;i<list.length-1;i++){
+    const [x0,y0] = list[i], [x1,y1] = list[i+1];
+    if(x>=x0 && x<=x1){
+      const t = x1===x0 ? 0 : (x-x0)/(x1-x0);
+      return y0 + (y1-y0)*t;
+    }
+  }
+  return list[list.length-1][1];
+}
+
+// Настоящий верхний контур всей картинки: в каждой точке x берём САМУЮ высокую
+// (наименьшую по y) точку среди всех трёх хребтов — путь никогда не проваливается
+// туда, где сзади виден более высокий холм.
+function envelopeY(x){
+  const vals = [roofAt(ROOF_1,x), roofAt(ROOF_2,x), roofAt(ROOF_3,x)].filter(v=>v!==null);
+  return Math.min(...vals);
+}
+
+const ENVELOPE_STEPS = 130;
+function buildEnvelope(){
+  const pts = [];
+  for(let i=0;i<=ENVELOPE_STEPS;i++){
+    const x = i/ENVELOPE_STEPS * MOUNTAIN_WIDTH;
+    pts.push([x, envelopeY(x)]);
+  }
+  return pts;
+}
+const MOUNTAIN_ENVELOPE = buildEnvelope();
+
+function pointOnEnvelope(pct){
+  const x = Math.max(0, Math.min(1, pct)) * MOUNTAIN_WIDTH;
+  return { x, y: envelopeY(x) };
 }
 
 function renderMountain(){
   const { rawToday, doneCount, targetDays, totalSlots } = computeTotals();
   const pct = totalSlots ? doneCount/totalSlots : 0;
-  const hikerPoint = pointAlongRidge(pct);
+  const hikerPoint = pointOnEnvelope(pct);
 
-  const ridgePts = MOUNTAIN_RIDGE.slice(0, hikerPoint.index+1);
-  ridgePts.push([hikerPoint.x, hikerPoint.y]);
-  const doneD = ridgePts.length>1 ? 'M' + ridgePts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') : '';
+  const cutIndex = Math.floor(pct * ENVELOPE_STEPS);
+  const donePts = MOUNTAIN_ENVELOPE.slice(0, cutIndex+1).map(p=>[p[0],p[1]]);
+  donePts.push([hikerPoint.x, hikerPoint.y]);
+  const doneD = donePts.length>1 ? 'M' + donePts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' L ') : '';
 
   const svg = `
     <svg viewBox="0 0 ${MOUNTAIN_WIDTH} ${MOUNTAIN_HEIGHT}" width="100%" height="${MOUNTAIN_HEIGHT}">
