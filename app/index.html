@@ -322,7 +322,7 @@ footer{ text-align:center; margin-top:18px; }
       <span class="eyebrow-sm">Напоминания</span>
       <h2>Подключить Telegram</h2>
       <p style="font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 12px;">
-        Бот раз в день, в 17:00 по вашему местному времени, напишет: если день ещё не заполнен — напомнит, если уже заполнен — похвалит. Команда /status покажет прогресс в любой момент.
+        Бот раз в день, в 17:00 по вашему местному времени, будет писать вам, чтобы челлендж не забывался. Команда /status покажет прогресс в любой момент.
       </p>
       <div id="telegramConnectedStatus" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;">
         <span style="color:var(--accent);font-weight:600;">✅ Telegram подключён<span id="telegramUsername"></span></span>
@@ -953,7 +953,7 @@ function bindSettingsScreen(){
   document.getElementById('telegramDisconnectBtn').addEventListener('click', () => {
     askConfirm(
       'Вы уверены, что хотите отключить?',
-      'Тогда вам не будут приходить оповещения в Telegram — ни напоминания, ни похвала. Подключить обратно можно в любой момент той же кнопкой.',
+      'Тогда бот перестанет писать вам в Telegram. Подключить обратно можно в любой момент той же кнопкой.',
       async () => {
         try{
           await updateDoc(doc(db, 'trackers', trackerId), { telegram_chat_id: null, telegram_username: null });
