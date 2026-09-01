@@ -55,6 +55,24 @@ h1{ font-family:var(--font-body); font-weight:800; font-size:26px; line-height:1
 .card h2{ font-family:var(--font-body); font-weight:800; font-size:18px; margin:0 0 12px; }
 .field{ margin-bottom:14px; }
 .field label{ display:block; font-size:12.5px; font-weight:700; color:var(--sub); margin-bottom:5px; }
+.help-wrap{ position:relative; display:inline-flex; vertical-align:middle; margin-left:6px; }
+.help-icon{
+  width:17px; height:17px; border-radius:50%; border:1px solid var(--border);
+  background:var(--card-bg,var(--bg)); color:var(--sub); font-size:11px; font-weight:700;
+  line-height:1; cursor:pointer; padding:0; display:inline-flex; align-items:center; justify-content:center;
+}
+.help-icon:hover{ border-color:var(--accent); color:var(--accent); }
+.help-tooltip{
+  display:none; position:absolute; top:22px; left:0; z-index:60; width:240px; max-width:70vw;
+  background:var(--card-bg,var(--bg)); border:1px solid var(--border); border-radius:8px;
+  padding:10px 26px 10px 12px; box-shadow:0 6px 20px rgba(0,0,0,.15);
+}
+.help-tooltip.open{ display:block; }
+.help-tooltip p{ margin:0; font-size:12px; font-weight:400; color:var(--sub); line-height:1.45; }
+.help-close{
+  position:absolute; top:4px; right:6px; background:none; border:none; font-size:15px;
+  line-height:1; color:var(--sub); cursor:pointer; padding:2px;
+}
 input[type=text], input[type=number], select, textarea{
   width:100%; font-family:var(--font-body); font-size:14px; color:var(--ink);
   border:1px solid var(--border); border-radius:var(--radius); padding:10px;
@@ -178,11 +196,11 @@ footer{ text-align:center; margin-top:18px; }
       <input type="text" id="inTitle" placeholder="например: 100 дней без сахара">
     </div>
     <div class="field">
-      <label for="inGoal">Ради чего челлендж (необязательно)</label>
+      <label for="inGoal">Ради чего челлендж (необязательно)<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Например: «чтобы через 1000 дней уверенно говорить на английском» или «чтобы пробежать марафон без остановки».</p></div></span></label>
       <textarea id="inGoal" placeholder="ваша цель своими словами"></textarea>
     </div>
     <div class="field">
-      <label for="inDays">Количество дней</label>
+      <label for="inDays">Количество дней<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Сколько дней нужно отметить «сделано», чтобы челлендж завершился. Пропустите день — не страшно, финиш просто сдвинется дальше, дни не сгорают.</p></div></span></label>
       <input type="number" id="inDays" min="1" step="1" value="100">
     </div>
     <div class="field">
@@ -200,7 +218,7 @@ footer{ text-align:center; margin-top:18px; }
       </select>
     </div>
     <div class="field">
-      <label for="inCheckLabel">Что считается «сделано» в день</label>
+      <label for="inCheckLabel">Что считается «сделано» в день<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Опишите одним действием, что нужно сделать за день, чтобы поставить галочку. Например: «позаниматься английским 20 минут» или «сделать 50 отжиманий». Эта же подпись появится у чек-бокса каждый день.</p></div></span></label>
       <input type="text" id="inCheckLabel" placeholder="например: тренировка сделана">
     </div>
     <div class="field">
@@ -263,6 +281,7 @@ footer{ text-align:center; margin-top:18px; }
       <div class="checkbox-row" id="doneRow">
         <input type="checkbox" id="doneCheck">
         <span id="doneLabel">Сделано</span>
+        <span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Отмечайте, только если реально выполнили сегодняшнее действие. Если забудете — ничего страшного, финиш просто сдвинется на день позже.</p></div></span>
       </div>
 
       <div class="field">
@@ -271,7 +290,7 @@ footer{ text-align:center; margin-top:18px; }
       </div>
 
       <div class="field">
-        <label for="noteInput">Заметка дня</label>
+        <label for="noteInput">Заметка дня<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Свободное поле — пара слов о том, как прошёл день: что получилось, что мешало, инсайт, настроение. Личный дневник для вас самих — приятно будет перечитать через 1000 дней.</p></div></span></label>
         <textarea id="noteInput" placeholder="мысль / наблюдение за сегодня"></textarea>
       </div>
 
@@ -290,7 +309,7 @@ footer{ text-align:center; margin-top:18px; }
   <!-- ЭКРАН ЗАМЕТОК -->
   <div id="notesScreen" style="display:none">
     <div class="top-nav"><button class="secondary" id="notesBackBtn">← Назад</button></div>
-    <h2 style="font-family:var(--font-display);font-size:20px;">Все заметки</h2>
+    <h2 style="font-family:var(--font-display);font-size:20px;">Все заметки<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Здесь можно вести любые свободные заметки — списки, идеи, планы — а ещё есть отдельный блок «Таблица прогрева» (календарь с датами) для привычек или контент-плана. Заметки не привязаны к дням челленджа.</p></div></span></h2>
     <div id="notesList"></div>
   </div>
 
@@ -300,9 +319,9 @@ footer{ text-align:center; margin-top:18px; }
     <h2 style="font-family:var(--font-display);font-size:20px;">Настройки трекера</h2>
 
     <div class="field"><label>Название</label><input type="text" id="stTitle"></div>
-    <div class="field"><label>Ради чего</label><textarea id="stGoal"></textarea></div>
-    <div class="field"><label>Количество дней</label><input type="number" id="stDays" min="1" step="1"></div>
-    <div class="field"><label>Что считается «сделано»</label><input type="text" id="stCheckLabel"></div>
+    <div class="field"><label>Ради чего<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Например: «чтобы через 1000 дней уверенно говорить на английском» или «чтобы пробежать марафон без остановки».</p></div></span></label><textarea id="stGoal"></textarea></div>
+    <div class="field"><label>Количество дней<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Сколько дней нужно отметить «сделано», чтобы челлендж завершился. Пропустите день — не страшно, финиш просто сдвинется дальше, дни не сгорают.</p></div></span></label><input type="number" id="stDays" min="1" step="1"></div>
+    <div class="field"><label>Что считается «сделано»<span class="help-wrap"><button type="button" class="help-icon" aria-label="Помощь">?</button><div class="help-tooltip"><button type="button" class="help-close" aria-label="Закрыть">×</button><p>Опишите одним действием, что нужно сделать за день, чтобы поставить галочку. Например: «позаниматься английским 20 минут» или «сделать 50 отжиманий». Эта же подпись появится у чек-бокса каждый день.</p></div></span></label><input type="text" id="stCheckLabel"></div>
     <div class="field">
       <label>Оформление</label>
       <select id="stStyle">
@@ -961,6 +980,28 @@ function askConfirm(title, text, onYes){
   document.getElementById('confirmYesBtn').addEventListener('click', () => { cleanup(); onYes(); }, {once:true});
   document.getElementById('confirmNoBtn').addEventListener('click', cleanup, {once:true});
 }
+
+function initHelpIcons(){
+  document.querySelectorAll('.help-icon').forEach(btn=>{
+    btn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      const panel = btn.nextElementSibling;
+      const wasOpen = panel.classList.contains('open');
+      document.querySelectorAll('.help-tooltip.open').forEach(p=>p.classList.remove('open'));
+      if(!wasOpen) panel.classList.add('open');
+    });
+  });
+  document.querySelectorAll('.help-close').forEach(btn=>{
+    btn.addEventListener('click',(e)=>{
+      e.stopPropagation();
+      btn.closest('.help-tooltip').classList.remove('open');
+    });
+  });
+  document.addEventListener('click', ()=>{
+    document.querySelectorAll('.help-tooltip.open').forEach(p=>p.classList.remove('open'));
+  });
+}
+initHelpIcons();
 
 init();
 
