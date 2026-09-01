@@ -145,8 +145,22 @@ button:active{ transform:translateY(1px); }
 .saved-banner b{ display:block; margin-bottom:4px; }
 .link-note{ font-size:11.5px; color:var(--sub); background:var(--card-bg); border:1px solid var(--border); border-radius:var(--radius); padding:10px 34px 10px 12px; margin-bottom:18px; line-height:1.5; position:relative; }
 .link-note .close-x{ position:absolute; top:6px; right:8px; background:none; border:none; font-size:16px; line-height:1; color:var(--sub); cursor:pointer; padding:4px; }
-.top-nav{ display:flex; gap:8px; justify-content:flex-end; margin-bottom:6px; }
+.top-nav{ display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap; margin-bottom:6px; }
 .top-nav button{ font-size:12px; padding:7px 11px; }
+.tracker-switch-wrap{ position:relative; }
+.tracker-switch-panel{
+  display:none; position:absolute; top:32px; right:0; z-index:60; min-width:200px; max-width:70vw;
+  max-height:280px; overflow-y:auto; background:var(--card-bg,var(--bg)); border:1px solid var(--border);
+  border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.15); padding:6px;
+}
+.tracker-switch-panel.open{ display:block; }
+.tracker-switch-item{
+  display:block; width:100%; text-align:left; padding:8px 10px; border:none; background:none;
+  font-size:13px; color:var(--ink); border-radius:6px; cursor:pointer;
+}
+.tracker-switch-item:hover{ background:var(--input-bg); }
+.tracker-switch-item.current{ font-weight:700; color:var(--accent); }
+.tracker-switch-empty{ padding:8px 10px; font-size:12px; color:var(--sub); }
 footer{ text-align:center; margin-top:18px; }
 .author-link{ background:none; border:none; color:var(--sub); font-size:12px; text-decoration:underline; cursor:pointer; padding:6px; }
 .error-box{ border:1px solid var(--accent); background:var(--miss-bg); border-radius:var(--radius); padding:14px; font-size:14px; margin-bottom:18px; }
@@ -243,13 +257,20 @@ footer{ text-align:center; margin-top:18px; }
   <div id="mainApp" style="display:none">
 
     <div class="top-nav">
+      <div class="tracker-switch-wrap">
+        <button class="secondary" id="trackerSwitchBtn">Мои челленджи ▾</button>
+        <div class="tracker-switch-panel" id="trackerSwitchPanel"></div>
+      </div>
+      <button class="secondary" id="addTrackerBtn">+ Ещё один</button>
       <button class="secondary" id="notesNavBtn">Заметки</button>
       <button class="secondary" id="settingsNavBtn">Настройки</button>
     </div>
 
     <div class="saved-banner" id="savedBanner" style="display:none">
       <b>Сохраните эту ссылку прямо сейчас</b>
-      В Safari нажмите «Поделиться» → «На экран Домой». Это единственный способ вернуться именно к вашему трекеру.
+      <p id="installDesktopNote" style="display:none;margin:4px 0 8px;">Это единственный способ вернуться именно к вашему трекеру. Выполните на телефоне:</p>
+      <p id="installIos" style="display:none;margin:2px 0;">В Safari нажмите «Поделиться» (квадрат со стрелкой вверх) → «На экран «Домой»» → «Добавить».</p>
+      <p id="installAndroid" style="display:none;margin:2px 0;">В Chrome нажмите ⋮ (три точки вверху справа) → «Добавить на главный экран» (или «Установить приложение») → «Добавить».</p>
     </div>
 
     <div class="link-note" id="linkNote">
@@ -498,10 +519,23 @@ async function init(){
   document.getElementById('pageTitle').textContent = tracker.title;
   document.getElementById('doneLabel').textContent = tracker.checkbox_label;
   document.getElementById('modalDoneLabel').textContent = tracker.checkbox_label;
+  registerTrackerLocally(trackerId, tracker.title);
 
   hide('loadingScreen');
   show('mainApp');
-  if(isNew){ show('savedBanner'); }
+  if(isNew){
+    show('savedBanner');
+    const platform = detectPlatform();
+    if(platform === 'ios'){
+      document.getElementById('installIos').style.display = '';
+    } else if(platform === 'android'){
+      document.getElementById('installAndroid').style.display = '';
+    } else {
+      document.getElementById('installDesktopNote').style.display = '';
+      document.getElementById('installIos').style.display = '';
+      document.getElementById('installAndroid').style.display = '';
+    }
+  }
   let linkNoteDismissed = false;
   try{ linkNoteDismissed = localStorage.getItem('link_note_dismissed_'+trackerId) === '1'; }catch(e){}
   if(linkNoteDismissed){ hide('linkNote'); }
@@ -922,6 +956,7 @@ function bindSettingsScreen(){
       });
       tracker.title = title; tracker.goal = goal; tracker.target_days = days;
       tracker.checkbox_label = checkLabel; tracker.style = style;
+      registerTrackerLocally(trackerId, title);
       applyStyle();
       document.getElementById('pageTitle').textContent = title;
       document.getElementById('doneLabel').textContent = checkLabel;
@@ -959,6 +994,7 @@ function bindSettingsScreen(){
       'Трекер и все записи будут удалены без возможности восстановить. Эта ссылка перестанет работать.',
       async () => {
         try{ await deleteDoc(doc(db, 'trackers', trackerId)); }catch(e){}
+        unregisterTrackerLocally(trackerId);
         window.location.href = window.location.pathname;
       }
     );
@@ -979,6 +1015,71 @@ function askConfirm(title, text, onYes){
   };
   document.getElementById('confirmYesBtn').addEventListener('click', () => { cleanup(); onYes(); }, {once:true});
   document.getElementById('confirmNoBtn').addEventListener('click', cleanup, {once:true});
+}
+
+const TRACKERS_KEY = 'my_trackers_v1';
+function getLocalTrackers(){
+  try{ return JSON.parse(localStorage.getItem(TRACKERS_KEY) || '[]'); }catch(e){ return []; }
+}
+function saveLocalTrackers(list){
+  try{ localStorage.setItem(TRACKERS_KEY, JSON.stringify(list)); }catch(e){}
+}
+function registerTrackerLocally(id, title){
+  const list = getLocalTrackers();
+  const idx = list.findIndex(t=>t.id===id);
+  if(idx>=0){ list[idx].title = title; }
+  else{ list.push({id, title}); }
+  saveLocalTrackers(list);
+}
+function unregisterTrackerLocally(id){
+  saveLocalTrackers(getLocalTrackers().filter(t=>t.id!==id));
+}
+function renderTrackerSwitch(){
+  const panel = document.getElementById('trackerSwitchPanel');
+  panel.innerHTML = '';
+  const list = getLocalTrackers();
+  if(list.length === 0){
+    const empty = document.createElement('div');
+    empty.className = 'tracker-switch-empty';
+    empty.textContent = 'Пока только этот челлендж';
+    panel.appendChild(empty);
+    return;
+  }
+  list.forEach(t=>{
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tracker-switch-item' + (t.id === trackerId ? ' current' : '');
+    btn.textContent = t.title || 'Без названия';
+    btn.addEventListener('click', () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('id', t.id);
+      window.location.href = url.toString();
+    });
+    panel.appendChild(btn);
+  });
+}
+function bindTrackerSwitch(){
+  document.getElementById('trackerSwitchBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    renderTrackerSwitch();
+    document.getElementById('trackerSwitchPanel').classList.toggle('open');
+  });
+  document.addEventListener('click', () => {
+    document.getElementById('trackerSwitchPanel').classList.remove('open');
+  });
+  document.getElementById('addTrackerBtn').addEventListener('click', () => {
+    const url = new URL(window.location.href);
+    url.searchParams.delete('id');
+    window.location.href = url.toString();
+  });
+}
+bindTrackerSwitch();
+
+function detectPlatform(){
+  const ua = navigator.userAgent || '';
+  if(/iPhone|iPad|iPod/.test(ua)) return 'ios';
+  if(/Android/.test(ua)) return 'android';
+  return 'desktop';
 }
 
 function initHelpIcons(){
