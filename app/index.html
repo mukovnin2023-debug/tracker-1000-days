@@ -318,28 +318,6 @@ footer{ text-align:center; margin-top:18px; }
 
     <hr style="border:none;border-top:1px solid var(--border);margin:24px 0;">
 
-    <div class="card" id="telegramCard">
-      <span class="eyebrow-sm">Напоминания</span>
-      <h2>Подключить Telegram</h2>
-      <p style="font-size:13px;color:var(--sub);line-height:1.5;margin:0 0 12px;">
-        Бот раз в день, в 17:00 по вашему местному времени, будет писать вам, чтобы челлендж не забывался. Команда /status покажет прогресс в любой момент.
-      </p>
-      <div id="telegramConnectedStatus" style="display:none;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;">
-        <span style="color:var(--accent);font-weight:600;">✅ Telegram подключён<span id="telegramUsername"></span></span>
-        <button class="secondary" id="telegramDisconnectBtn" style="font-size:12px;padding:4px 10px;">Отключить уведомления</button>
-      </div>
-      <label id="telegramConsentLabel" style="display:flex;align-items:flex-start;gap:8px;font-size:12px;color:var(--sub);line-height:1.4;margin-bottom:10px;cursor:pointer;">
-        <input type="checkbox" id="telegramConsentCheckbox" style="margin-top:2px;">
-        <span>Согласен(на) на обработку данных из Telegram (ID чата, имя и/или ник — нужны только чтобы бот мог написать вам) согласно <a href="privacy.html" target="_blank" rel="noopener">политике обработки данных</a>. Понимаю, что ссылка на трекер — единственный ключ доступа: всё, что по ней видно (включая эти данные), увидит любой, кому я передам ссылку — за её сохранность в тайне отвечаю сам(а)</span>
-      </label>
-      <span class="save-flash" id="telegramConsentFlash"></span>
-      <a id="telegramConnectLink" href="#" target="_blank" rel="noopener">
-        <button class="secondary" id="telegramConnectBtn">Подключить Telegram →</button>
-      </a>
-    </div>
-
-    <hr style="border:none;border-top:1px solid var(--border);margin:24px 0;">
-
     <div class="field">
       <button class="danger" id="stResetBtn">Сбросить все дни</button>
       <div class="sub" style="margin-top:6px;">Обнулит все записи по дням. Ссылка и настройки останутся прежними.</div>
@@ -501,7 +479,6 @@ async function init(){
   document.getElementById('pageTitle').textContent = tracker.title;
   document.getElementById('doneLabel').textContent = tracker.checkbox_label;
   document.getElementById('modalDoneLabel').textContent = tracker.checkbox_label;
-  document.getElementById('telegramConnectLink').href = `https://t.me/tracker_az_bot?start=${trackerId}`;
 
   hide('loadingScreen');
   show('mainApp');
@@ -894,7 +871,7 @@ function escapeHtml(s){
   return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
-async function openSettings(){
+function openSettings(){
   document.getElementById('stTitle').value = tracker.title;
   document.getElementById('stGoal').value = tracker.goal || '';
   document.getElementById('stDays').value = tracker.target_days;
@@ -902,38 +879,10 @@ async function openSettings(){
   document.getElementById('stStyle').value = tracker.style || 'paper';
   hide('mainApp');
   show('settingsScreen');
-  try{
-    const fresh = await getDoc(doc(db, 'trackers', trackerId));
-    if(fresh.exists()){
-      tracker.telegram_chat_id = fresh.data().telegram_chat_id || null;
-      tracker.telegram_username = fresh.data().telegram_username || null;
-      tracker.telegram_first_name = fresh.data().telegram_first_name || null;
-    }
-  }catch(e){}
-  updateTelegramCard();
-}
-function updateTelegramCard(){
-  const connected = !!tracker.telegram_chat_id;
-  document.getElementById('telegramConnectedStatus').style.display = connected ? 'flex' : 'none';
-  document.getElementById('telegramConnectLink').style.display = connected ? 'none' : '';
-  document.getElementById('telegramUsername').textContent = tracker.telegram_username ? ` (@${tracker.telegram_username})` : (tracker.telegram_first_name ? ` (${tracker.telegram_first_name})` : '');
 }
 function closeSettings(){ hide('settingsScreen'); show('mainApp'); }
 
 function bindSettingsScreen(){
-  document.getElementById('telegramConnectLink').addEventListener('click', async (e) => {
-    const consentFlash = document.getElementById('telegramConsentFlash');
-    if(!document.getElementById('telegramConsentCheckbox').checked){
-      e.preventDefault();
-      consentFlash.textContent = 'сначала отметьте согласие выше';
-      consentFlash.style.color = 'var(--accent)';
-      consentFlash.classList.add('show');
-      setTimeout(()=>consentFlash.classList.remove('show'), 3000);
-      return;
-    }
-    try{ await updateDoc(doc(db, 'trackers', trackerId), { telegram_consent_at: serverTimestamp() }); }catch(err){}
-  });
-
   document.getElementById('stSaveBtn').addEventListener('click', async () => {
     const flash = document.getElementById('stFlash');
     const title = document.getElementById('stTitle').value.trim();
@@ -967,22 +916,6 @@ function bindSettingsScreen(){
     }
     flash.classList.add('show');
     setTimeout(()=>flash.classList.remove('show'), 2000);
-  });
-
-  document.getElementById('telegramDisconnectBtn').addEventListener('click', () => {
-    askConfirm(
-      'Вы уверены, что хотите отключить?',
-      'Тогда бот перестанет писать вам в Telegram. Подключить обратно можно в любой момент той же кнопкой.',
-      async () => {
-        try{
-          await updateDoc(doc(db, 'trackers', trackerId), { telegram_chat_id: null, telegram_username: null, telegram_first_name: null });
-        }catch(e){}
-        tracker.telegram_chat_id = null;
-        tracker.telegram_username = null;
-        tracker.telegram_first_name = null;
-        updateTelegramCard();
-      }
-    );
   });
 
   document.getElementById('stResetBtn').addEventListener('click', () => {

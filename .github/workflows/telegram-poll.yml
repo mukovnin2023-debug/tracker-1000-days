@@ -13,10 +13,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: npm install
-        working-directory: bot
-      - run: node poll.js
-        working-directory: bot
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+      # ПАУЗА (юридическая): Telegram-бот отключён от продакшена, пока данные хранятся
+      # не на российском сервере (152-ФЗ, локализация ПДн). Раскомментировать шаги ниже
+      # после переезда бэкенда на российский хостинг.
+      - run: echo "Telegram bot paused — see comment above"
+      # - run: npm install
+      #   working-directory: bot
+      # - run: node poll.js
+      #   working-directory: bot
+      #   env:
+      #     TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      #     FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
